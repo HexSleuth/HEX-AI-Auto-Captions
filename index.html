@@ -1,0 +1,2467 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="corporate">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HEX AI Auto Captions + Subtitles + Whisper AI + GTranslate — No API Key</title>
+<meta name="description" content="Browser live subtitles, Whisper AI file transcription, SRT/VTT export, custom theme colors, and GTranslate. No API key needed." />
+
+<style>
+  /* ============================================================
+     FORCED DARK THEME ENGINE — CSS VARIABLES
+     ============================================================ */
+  :root {
+    --theme-bg: #0d1117;
+    --theme-panel: #161b22;
+    --theme-panel-2: #12161d;
+    --theme-panel-3: #1c2128;
+    --theme-border: #30363d;
+    --theme-border-soft: #21262d;
+    --theme-text: #e6edf3;
+    --theme-muted: #8b949e;
+    --theme-primary: #2f81f7;
+    --theme-secondary: #3fb950;
+    --theme-accent: #d29922;
+    --theme-danger: #f85149;
+    --theme-success: #3fb950;
+    --theme-glow: rgba(47,129,247,.25);
+
+    --sub-color: #ffffff;
+    --sub-interim-color: #c9d1d9;
+
+    --radius: 14px;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { min-height: 100%; margin: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "Noto Sans", sans-serif;
+    color: var(--theme-text);
+    background:
+      radial-gradient(1100px 560px at 8% -12%, color-mix(in srgb, var(--theme-primary) 18%, transparent), transparent 62%),
+      radial-gradient(900px 520px at 100% 0%, color-mix(in srgb, var(--theme-secondary) 14%, transparent), transparent 58%),
+      var(--theme-bg);
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color .35s ease, color .25s ease;
+  }
+
+  /* ============================================================
+     THEME GALLERY
+     ============================================================ */
+  .theme-section { max-width: 1080px; margin: 0 auto; padding: 14px 20px 0; }
+  .theme-toggle {
+    display: inline-flex; align-items: center; gap: 10px; cursor: pointer;
+    font-size: 13px; font-weight: 650; color: var(--theme-muted);
+    background: var(--theme-panel); border: 1px solid var(--theme-border);
+    border-radius: 10px; padding: 9px 14px;
+    transition: border-color .2s, color .2s, background .2s;
+    font-family: inherit;
+  }
+  .theme-toggle:hover { border-color: var(--theme-primary); color: var(--theme-text); }
+  .theme-gallery {
+    display: none;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px; margin-top: 14px;
+  }
+  .theme-gallery.open { display: grid; }
+  .theme-card {
+    border: 2px solid var(--theme-border); border-radius: 12px; overflow: hidden;
+    cursor: pointer; transition: border-color .2s, transform .15s, box-shadow .2s;
+    background: var(--theme-panel); user-select: none;
+  }
+  .theme-card:hover { transform: translateY(-2px); border-color: var(--theme-primary); }
+  .theme-card.active {
+    border-color: var(--theme-success);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--theme-success) 35%, transparent);
+  }
+  .theme-card .swatch-strip { display: flex; height: 34px; }
+  .theme-card .swatch-strip span { flex: 1; }
+  .theme-card .theme-label {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 7px 10px; font-size: 12px; font-weight: 600;
+    color: var(--theme-text); text-transform: capitalize;
+  }
+  .theme-card .theme-label .check {
+    color: var(--theme-success); font-weight: 800; opacity: 0; transition: opacity .2s;
+  }
+  .theme-card.active .theme-label .check { opacity: 1; }
+
+  .custom-colors {
+    display: none; margin-top: 16px; padding: 16px;
+    background: var(--theme-panel); border: 1px solid var(--theme-border);
+    border-radius: var(--radius);
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px;
+  }
+  .custom-colors.open { display: grid; }
+  .color-field { display: flex; flex-direction: column; gap: 5px; }
+  .color-field label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .5px; color: var(--theme-muted);
+  }
+  .color-field input[type="color"] {
+    width: 100%; height: 40px; border: 1px solid var(--theme-border);
+    border-radius: 8px; background: var(--theme-bg);
+    cursor: pointer; padding: 3px;
+  }
+  .color-actions {
+    grid-column: 1/-1; display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px;
+  }
+
+  /* ============================================================
+     HEADER
+     ============================================================ */
+  .topbar {
+    max-width: 1080px; margin: 0 auto; padding: 22px 20px 6px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 18px; flex-wrap: wrap;
+  }
+  .brand { display: flex; align-items: center; gap: 14px; min-width: 250px; }
+  .logo {
+    width: 46px; height: 46px; flex: 0 0 46px; border-radius: 12px;
+    display: grid; place-items: center; font-weight: 800; font-size: 15px;
+    letter-spacing: .5px; color: #fff;
+    background: linear-gradient(145deg, var(--theme-primary), color-mix(in srgb, var(--theme-primary) 60%, var(--theme-secondary)) 55%, var(--theme-secondary));
+    box-shadow: 0 8px 22px var(--theme-glow);
+    transition: background .35s ease, box-shadow .35s ease;
+  }
+  .brand h1 {
+    margin: 0; font-size: 19px; letter-spacing: -.2px;
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .brand .sub { margin: 3px 0 0; font-size: 12.5px; color: var(--theme-muted); }
+  .badge {
+    font-size: 10.5px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .6px; padding: 3px 8px; border-radius: 999px;
+    color: var(--theme-success);
+    background: color-mix(in srgb, var(--theme-success) 14%, transparent);
+    border: 1px solid color-mix(in srgb, var(--theme-success) 38%, transparent);
+  }
+  .badge.ai {
+    color: #d2a8ff;
+    background: rgba(163,113,247,.14);
+    border-color: rgba(163,113,247,.42);
+  }
+  .gtranslate_wrapper {
+    min-width: 180px; display: flex; justify-content: flex-end; align-items: center;
+  }
+  .gt-fallback {
+    font-size: 13px; color: var(--theme-primary); text-decoration: none;
+    border: 1px solid var(--theme-border); border-radius: 9px;
+    padding: 7px 12px; background: var(--theme-panel);
+  }
+  .gt-fallback:hover { border-color: var(--theme-primary); }
+
+  /* ============================================================
+     LAYOUT
+     ============================================================ */
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 12px 20px 70px; }
+  .card {
+    background: linear-gradient(180deg, var(--theme-panel), var(--theme-panel-2));
+    border: 1px solid var(--theme-border);
+    border-radius: var(--radius);
+    padding: 18px; margin-bottom: 18px;
+    box-shadow: 0 14px 34px rgba(0,0,0,.38);
+    transition: background .35s ease, border-color .35s ease;
+  }
+  .card h2 {
+    margin: 0 0 4px; font-size: 13.5px; text-transform: uppercase;
+    letter-spacing: .8px; color: var(--theme-muted); font-weight: 700;
+  }
+  .card .desc { margin: 0 0 14px; font-size: 13px; color: var(--theme-muted); line-height: 1.55; }
+
+  /* ============================================================
+     STAGE
+     ============================================================ */
+  .stage {
+    position: relative; width: 100%; aspect-ratio: 16/9;
+    background: #05070a; border: 1px solid var(--theme-border);
+    border-radius: 12px; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .stage video {
+    width: 100%; height: 100%; object-fit: contain;
+    background: #000; display: block;
+  }
+  .stage video[hidden] { display: none; }
+
+  .stage-placeholder {
+    display: flex; flex-direction: column; align-items: center; gap: 16px;
+    color: #4d565f; user-select: none; text-align: center; padding: 20px;
+  }
+  .stage-placeholder .icon {
+    width: 66px; height: 66px; border-radius: 50%;
+    border: 2px dashed var(--theme-border);
+    display: grid; place-items: center;
+    transition: border-color .25s, background .25s;
+  }
+  .stage-placeholder .icon svg { width: 30px; height: 30px; opacity: .65; }
+  .stage-placeholder span { font-size: 12.5px; letter-spacing: .4px; }
+
+  .bars { display: flex; gap: 5px; align-items: flex-end; height: 44px; }
+  .bars i {
+    display: block; width: 6px; border-radius: 3px;
+    background: linear-gradient(180deg, var(--theme-primary), var(--theme-secondary));
+    height: 8px; opacity: .35; transition: opacity .2s;
+  }
+  .stage.listening .bars i { opacity: 1; animation: bounce 1s infinite ease-in-out; }
+  .stage.listening .bars i:nth-child(1) { animation-delay: 0s; }
+  .stage.listening .bars i:nth-child(2) { animation-delay: .12s; }
+  .stage.listening .bars i:nth-child(3) { animation-delay: .24s; }
+  .stage.listening .bars i:nth-child(4) { animation-delay: .36s; }
+  .stage.listening .bars i:nth-child(5) { animation-delay: .48s; }
+  .stage.listening .stage-placeholder .icon {
+    border-color: color-mix(in srgb, var(--theme-success) 70%, transparent);
+    background: color-mix(in srgb, var(--theme-success) 8%, transparent);
+  }
+  @keyframes bounce {
+    0%, 100% { height: 8px; }
+    50% { height: 40px; }
+  }
+
+  /* ============================================================
+     SUBTITLE OVERLAY
+     ============================================================ */
+  .subs {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    padding: 80px 24px 26px;
+    background: linear-gradient(to top, rgba(0,0,0,.92), rgba(0,0,0,.55) 45%, transparent);
+    text-align: center; pointer-events: none;
+    display: flex; flex-direction: column; justify-content: flex-end; gap: 8px;
+    min-height: 42%;
+  }
+  .sub-line {
+    display: block;
+    font-size: clamp(17px, 3.2vw, 30px);
+    line-height: 1.35; font-weight: 800;
+    letter-spacing: -.2px;
+    color: var(--sub-color);
+    text-shadow: 0 2px 12px rgba(0,0,0,.98), 0 0 4px rgba(0,0,0,.9);
+    word-break: break-word;
+    transition: opacity .15s, color .2s;
+  }
+  .sub-line.interim {
+    font-weight: 500; font-style: italic;
+    color: var(--sub-interim-color);
+    text-shadow: 0 2px 8px rgba(0,0,0,.9);
+    min-height: 1px;
+  }
+  .sub-line.placeholder {
+    font-weight: 500; font-style: normal;
+    color: #6e7681;
+    font-size: clamp(14px, 2.1vw, 18px);
+    text-shadow: none;
+  }
+
+  /* ============================================================
+     CONTROLS
+     ============================================================ */
+  .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+  .row + .row { margin-top: 14px; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field > span,
+  .field > label {
+    font-size: 11.5px; font-weight: 700; letter-spacing: .5px;
+    text-transform: uppercase; color: var(--theme-muted);
+  }
+  select, input[type="file"] {
+    background: var(--theme-bg); color: var(--theme-text);
+    border: 1px solid var(--theme-border);
+    border-radius: 10px; padding: 9px 12px;
+    font-size: 14px; outline: none; min-width: 240px;
+    font-family: inherit;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  select:focus, input[type="file"]:focus {
+    border-color: var(--theme-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-primary) 25%, transparent);
+  }
+  input[type="file"] { padding: 7px 10px; font-size: 13px; cursor: pointer; }
+  input[type="file"]::file-selector-button {
+    background: var(--theme-panel-3); color: var(--theme-text);
+    border: 1px solid var(--theme-border);
+    border-radius: 8px; padding: 6px 12px; margin-right: 10px;
+    cursor: pointer; font-weight: 600; font-family: inherit;
+  }
+  input[type="file"]::file-selector-button:hover {
+    border-color: var(--theme-primary);
+  }
+
+  .btn {
+    appearance: none; border: 1px solid var(--theme-border);
+    background: var(--theme-panel-3); color: var(--theme-text);
+    padding: 10px 16px; border-radius: 10px;
+    font-size: 13.5px; font-weight: 650; cursor: pointer;
+    transition: background .15s, border-color .15s, transform .08s, filter .15s;
+    display: inline-flex; align-items: center; gap: 8px;
+    white-space: nowrap; font-family: inherit;
+  }
+  .btn:hover:not(:disabled) { background: var(--theme-border); border-color: var(--theme-muted); }
+  .btn:active:not(:disabled) { transform: translateY(1px); }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn.primary {
+    background: linear-gradient(180deg, var(--theme-primary), color-mix(in srgb, var(--theme-primary) 80%, #000));
+    border-color: color-mix(in srgb, var(--theme-primary) 80%, #000);
+    color: #fff;
+    box-shadow: 0 6px 18px var(--theme-glow);
+  }
+  .btn.primary:hover:not(:disabled) { filter: brightness(1.15); }
+  .btn.stop {
+    background: linear-gradient(180deg, var(--theme-danger), color-mix(in srgb, var(--theme-danger) 85%, #000));
+    border-color: color-mix(in srgb, var(--theme-danger) 85%, #000);
+    color: #fff;
+  }
+  .btn.stop:hover:not(:disabled) { filter: brightness(1.1); }
+  .btn.ai {
+    background: linear-gradient(180deg, #a371f7, #8957e5);
+    border-color: #8957e5; color: #fff;
+    box-shadow: 0 6px 18px rgba(163,113,247,.32);
+  }
+  .btn.ai:hover:not(:disabled) { filter: brightness(1.14); }
+  .btn.ghost { background: transparent; }
+
+  .status {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 7px 13px; border-radius: 999px;
+    font-size: 12.5px; font-weight: 650;
+    background: var(--theme-bg); border: 1px solid var(--theme-border);
+    color: var(--theme-muted);
+  }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: #484f58; flex: 0 0 9px; }
+  .status.listening {
+    color: color-mix(in srgb, var(--theme-success) 90%, #fff);
+    border-color: color-mix(in srgb, var(--theme-success) 45%, transparent);
+    background: color-mix(in srgb, var(--theme-success) 10%, transparent);
+  }
+  .status.listening .dot {
+    background: var(--theme-success);
+    animation: pulse 1.15s infinite;
+  }
+  .status.error {
+    color: #ff7b72;
+    border-color: color-mix(in srgb, var(--theme-danger) 45%, transparent);
+    background: color-mix(in srgb, var(--theme-danger) 10%, transparent);
+  }
+  .status.error .dot { background: var(--theme-danger); }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--theme-success) 55%, transparent); }
+    70% { box-shadow: 0 0 0 9px transparent; }
+    100% { box-shadow: 0 0 0 0 transparent; }
+  }
+
+  /* ============================================================
+     TRANSCRIPT
+     ============================================================ */
+  .transcript {
+    margin-top: 14px; max-height: 320px; overflow-y: auto;
+    border: 1px solid var(--theme-border); border-radius: 12px;
+    background: color-mix(in srgb, var(--theme-bg) 70%, #000);
+    padding: 8px;
+  }
+  .transcript::-webkit-scrollbar { width: 10px; }
+  .transcript::-webkit-scrollbar-thumb {
+    background: var(--theme-border); border-radius: 8px;
+    border: 2px solid var(--theme-bg);
+  }
+  .seg {
+    display: flex; gap: 12px; padding: 9px 11px; border-radius: 9px;
+    font-size: 14.5px; line-height: 1.5; align-items: flex-start;
+  }
+  .seg:nth-child(odd) { background: rgba(255,255,255,.025); }
+  .seg-time {
+    flex: 0 0 auto;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11.5px; color: var(--theme-primary);
+    padding-top: 3px; white-space: nowrap; letter-spacing: -.2px;
+  }
+  .seg-text { flex: 1 1 auto; word-break: break-word; }
+  .seg .seg-src {
+    flex: 0 0 auto;
+    font-size: 9.5px; font-weight: 800; letter-spacing: .5px;
+    text-transform: uppercase; padding: 2px 6px; border-radius: 5px;
+    margin-top: 2px;
+    background: rgba(163,113,247,.16);
+    color: #d2a8ff;
+    border: 1px solid rgba(163,113,247,.4);
+  }
+  .empty { color: #565f6b; font-size: 13.5px; padding: 22px 12px; text-align: center; }
+
+  .meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--theme-muted); margin-top: 12px; }
+  .meta b { color: var(--theme-text); font-weight: 650; }
+
+  .hint { margin: 12px 0 0; font-size: 12.5px; line-height: 1.6; color: var(--theme-muted); }
+  .hint code {
+    background: var(--theme-bg); border: 1px solid var(--theme-border);
+    border-radius: 5px; padding: 1px 6px;
+    font-size: 12px; color: var(--theme-primary);
+  }
+
+  .warnbox {
+    display: none; margin-bottom: 18px; padding: 13px 16px;
+    border-radius: 12px; font-size: 13.5px; line-height: 1.55;
+    color: #ffd8a8;
+    background: color-mix(in srgb, var(--theme-accent) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--theme-accent) 42%, transparent);
+  }
+  .warnbox.show { display: block; }
+  .warnbox code { background: rgba(0,0,0,.35); border-radius: 4px; padding: 1px 5px; }
+
+  /* ============================================================
+     AI PANEL
+     ============================================================ */
+  .ai-card {
+    border-color: rgba(163,113,247,.4);
+    background: linear-gradient(180deg, var(--theme-panel), color-mix(in srgb, #a371f7 8%, var(--theme-panel-2)));
+  }
+  .ai-card h2 { color: #d2a8ff; }
+
+  .grid {
+    display: grid; gap: 14px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+  .ai-progress-wrap { margin-top: 16px; }
+  .progress {
+    height: 9px; background: var(--theme-bg);
+    border: 1px solid var(--theme-border);
+    border-radius: 999px; overflow: hidden;
+  }
+  .progress > i {
+    display: block; height: 100%; width: 0;
+    background: linear-gradient(90deg, var(--theme-primary), #a371f7, var(--theme-secondary));
+    background-size: 200% 100%;
+    transition: width .25s ease;
+    animation: slide 2.2s linear infinite;
+  }
+  .progress > i.indeterminate {
+    width: 35% !important;
+    animation: indet 1.3s ease-in-out infinite;
+  }
+  @keyframes slide {
+    0% { background-position: 0% 0; }
+    100% { background-position: 200% 0; }
+  }
+  @keyframes indet {
+    0% { margin-left: -35%; }
+    100% { margin-left: 100%; }
+  }
+  .ai-statusline {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 10px; margin-top: 9px; font-size: 12.5px;
+  }
+  .ai-status { color: var(--theme-muted); font-weight: 600; }
+  .ai-status.ok { color: color-mix(in srgb, var(--theme-success) 90%, #fff); }
+  .ai-status.err { color: #ff7b72; }
+  .ai-status.busy { color: #d2a8ff; }
+  .ai-percent {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px; color: var(--theme-muted); font-weight: 700;
+  }
+  .ai-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 700; letter-spacing: .4px;
+    text-transform: uppercase; padding: 3px 9px;
+    border-radius: 999px;
+    background: rgba(163,113,247,.14);
+    border: 1px solid rgba(163,113,247,.42);
+    color: #d2a8ff;
+  }
+  .ai-pill.ready {
+    background: color-mix(in srgb, var(--theme-success) 14%, transparent);
+    border-color: color-mix(in srgb, var(--theme-success) 45%, transparent);
+    color: color-mix(in srgb, var(--theme-success) 90%, #fff);
+  }
+  .ai-pill.busy {
+    background: rgba(210,153,34,.14);
+    border-color: rgba(210,153,34,.42);
+    color: #f0c674;
+  }
+
+  .ai-live {
+    margin-top: 14px; padding: 12px 14px; border-radius: 12px;
+    background: color-mix(in srgb, var(--theme-bg) 70%, #000);
+    border: 1px solid var(--theme-border);
+  }
+  .ai-live-label {
+    display: block; font-size: 10.5px; font-weight: 800;
+    letter-spacing: .7px; text-transform: uppercase;
+    color: #d2a8ff; margin-bottom: 7px;
+  }
+  .ai-live-text {
+    font-size: 13.5px; line-height: 1.6; color: var(--theme-text);
+    max-height: 140px; overflow-y: auto;
+    white-space: pre-wrap; word-break: break-word;
+  }
+  .ai-live-text:empty::after {
+    content: 'Waiting…'; color: #565f6b; font-style: italic;
+  }
+
+  /* ============================================================
+     FOOTER
+     ============================================================ */
+  footer {
+    max-width: 1080px; margin: 0 auto; padding: 0 20px 40px;
+    color: #565f6b; font-size: 12px; line-height: 1.6;
+  }
+  footer b { color: var(--theme-muted); }
+
+  @media (max-width: 620px) {
+    .brand h1 { font-size: 17px; }
+    select { min-width: 180px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= THEME GALLERY ================= -->
+<div class="theme-section">
+  <button class="theme-toggle" id="themeToggle" type="button">🎨 System Theme &amp; Colors ▾</button>
+  <div class="theme-gallery" id="themeGallery"></div>
+  <div class="custom-colors" id="customColors">
+    <div class="color-field">
+      <label>Primary</label>
+      <input type="color" id="customPrimary" value="#4b6bfb" />
+    </div>
+    <div class="color-field">
+      <label>Secondary</label>
+      <input type="color" id="customSecondary" value="#7b92b2" />
+    </div>
+    <div class="color-field">
+      <label>Accent</label>
+      <input type="color" id="customAccent" value="#67cba0" />
+    </div>
+    <div class="color-field">
+      <label>Neutral (base)</label>
+      <input type="color" id="customNeutral" value="#181a2a" />
+    </div>
+    <div class="color-field">
+      <label>Background</label>
+      <input type="color" id="customBg" value="#0d1117" />
+    </div>
+    <div class="color-field">
+      <label>Panel</label>
+      <input type="color" id="customPanel" value="#161b22" />
+    </div>
+    <div class="color-field">
+      <label>Border</label>
+      <input type="color" id="customBorder" value="#30363d" />
+    </div>
+    <div class="color-field">
+      <label>Text</label>
+      <input type="color" id="customText" value="#e6edf3" />
+    </div>
+    <div class="color-field">
+      <label>Muted Text</label>
+      <input type="color" id="customMuted" value="#8b949e" />
+    </div>
+    <div class="color-field">
+      <label>Subtitle Color</label>
+      <input type="color" id="customSubColor" value="#ffffff" />
+    </div>
+    <div class="color-field">
+      <label>Interim Color</label>
+      <input type="color" id="customInterimColor" value="#c9d1d9" />
+    </div>
+    <div class="color-actions">
+      <button class="btn primary" id="applyColors" type="button">Apply Custom Colors</button>
+      <button class="btn ghost" id="resetColors" type="button">Reset Theme</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= HEADER + GTRANSLATE ================= -->
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">CC</div>
+    <div>
+      <h1>HEX AI Auto Captions <span class="badge">No API Key</span> <span class="badge ai">Whisper AI</span></h1>
+      <p class="sub">Live mic subtitles · Whisper AI file transcription · SRT / VTT export</p>
+    </div>
+  </div>
+  <div class="gtranslate_wrapper" id="gtWrapper"></div>
+</header>
+
+<!-- ================= MAIN ================= -->
+<main class="wrap">
+
+  <div id="supportWarn" class="warnbox">
+    <strong>Browser not supported.</strong> Live mic captioning uses the Web Speech API.
+    Please open it in <b>Google Chrome</b>, <b>Microsoft Edge</b> or <b>Safari</b>.
+    (Firefox has not implemented <code>SpeechRecognition</code> yet.)
+    Whisper AI file transcription still works in any modern browser.
+  </div>
+
+  <div id="secureWarn" class="warnbox">
+    <strong>Microphone blocked.</strong> Speech recognition requires a
+    <b>secure context</b>: <code>https://</code> or <code>http://localhost</code>.
+    Opening the file with <code>file://</code> won't work in most browsers.
+  </div>
+
+  <!-- STAGE + SUBTITLES -->
+  <section class="card">
+    <h2>Subtitle stage</h2>
+    <p class="desc">Live subtitles render here. Speak into the mic, or load a media file and use Whisper AI below.</p>
+
+    <div class="stage" id="stage">
+      <div class="stage-placeholder" id="stagePlaceholder">
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v1a7 7 0 0 1-14 0v-1"/>
+            <line x1="12" y1="19" x2="12" y2="23"/>
+            <line x1="8" y1="23" x2="16" y2="23"/>
+          </svg>
+        </div>
+        <div class="bars"><i></i><i></i><i></i><i></i><i></i></div>
+        <span id="phText">Press “Start listening” and begin speaking…</span>
+      </div>
+      <video id="player" controls playsinline preload="metadata" hidden></video>
+
+      <div class="subs" id="subs">
+        <span class="sub-line placeholder" id="subFinal">Press “Start listening” and begin speaking…</span>
+        <span class="sub-line interim" id="subInterim"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIVE MIC CONTROLS -->
+  <section class="card">
+    <h2>Live microphone captions</h2>
+    <p class="desc">Pick the language you're speaking, then hit <b>Start listening</b>. Everything runs in the browser — no API key, no server.</p>
+
+    <div class="row">
+      <label class="field">
+        <span>Recognition language</span>
+        <select id="lang">
+          <option value="en-US" selected>English (US)</option>
+          <option value="en-GB">English (UK)</option>
+          <option value="en-IN">English (India)</option>
+          <option value="en-AU">English (Australia)</option>
+          <option value="hi-IN">हिन्दी — Hindi</option>
+          <option value="bn-IN">বাংলা — Bengali</option>
+          <option value="mr-IN">मराठी — Marathi</option>
+          <option value="ta-IN">தமிழ் — Tamil</option>
+          <option value="te-IN">తెలుగు — Telugu</option>
+          <option value="gu-IN">ગુજરાતી — Gujarati</option>
+          <option value="kn-IN">ಕನ್ನಡ — Kannada</option>
+          <option value="ml-IN">മലയാളം — Malayalam</option>
+          <option value="pa-IN">ਪੰਜਾਬੀ — Punjabi</option>
+          <option value="ur-PK">اردو — Urdu</option>
+          <option value="es-ES">Español — Spanish</option>
+          <option value="fr-FR">Français — French</option>
+          <option value="de-DE">Deutsch — German</option>
+          <option value="it-IT">Italiano — Italian</option>
+          <option value="pt-BR">Português (Brasil)</option>
+          <option value="ru-RU">Русский — Russian</option>
+          <option value="nl-NL">Nederlands — Dutch</option>
+          <option value="pl-PL">Polski — Polish</option>
+          <option value="tr-TR">Türkçe — Turkish</option>
+          <option value="ar-SA">العربية — Arabic</option>
+          <option value="fa-IR">فارسی — Persian</option>
+          <option value="he-IL">עברית — Hebrew</option>
+          <option value="el-GR">Ελληνικά — Greek</option>
+          <option value="sv-SE">Svenska — Swedish</option>
+          <option value="uk-UA">Українська — Ukrainian</option>
+          <option value="id-ID">Bahasa Indonesia</option>
+          <option value="ms-MY">Bahasa Melayu</option>
+          <option value="fil-PH">Filipino</option>
+          <option value="th-TH">ไทย — Thai</option>
+          <option value="vi-VN">Tiếng Việt — Vietnamese</option>
+          <option value="ja-JP">日本語 — Japanese</option>
+          <option value="ko-KR">한국어 — Korean</option>
+          <option value="zh-CN">中文（简体）— Chinese</option>
+          <option value="zh-TW">中文（繁體）— Chinese</option>
+        </select>
+      </label>
+
+      <div class="field">
+        <span>Status</span>
+        <div id="status" class="status"><span class="dot"></span><span id="statusText">Idle</span></div>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:16px">
+      <button id="startBtn" class="btn primary" type="button">● Start listening</button>
+      <button id="stopBtn"  class="btn stop" type="button" disabled>■ Stop</button>
+      <button id="clearBtn" class="btn ghost" type="button">✕ Clear all</button>
+    </div>
+
+    <p class="hint">
+      Allow microphone access when prompted. Chrome ends the session after a short silence —
+      this page restarts it automatically so you can keep talking.
+    </p>
+  </section>
+
+  <!-- ================= AI MODEL SECTION ================= -->
+  <section class="card ai-card" id="aiCard">
+    <h2>AI Captions — Whisper <span class="ai-pill" id="aiPill">Not loaded</span></h2>
+    <p class="desc">
+      Runs <b>OpenAI Whisper</b> fully inside your browser via <b>Transformers.js</b>.
+      Models are fetched once from Hugging Face and cached for offline reuse —
+      <b>no API key, no server, no upload</b>. Load a media file below, then hit
+      <b>Generate AI Captions</b> — the model auto-downloads on first use.
+    </p>
+
+    <div class="grid">
+      <label class="field">
+        <label for="aiModel">AI model</label>
+        <select id="aiModel">
+          <option value="Xenova/whisper-tiny.en" selected>Whisper Tiny · English · ~40 MB</option>
+          <option value="Xenova/whisper-base.en">Whisper Base · English · ~75 MB</option>
+          <option value="Xenova/whisper-tiny">Whisper Tiny · multilingual · ~40 MB</option>
+          <option value="Xenova/whisper-base">Whisper Base · multilingual · ~75 MB</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <label for="aiDevice">Compute device</label>
+        <select id="aiDevice">
+          <option value="wasm" selected>WASM · CPU · works everywhere</option>
+          <option value="webgpu">WebGPU · GPU · faster (Chrome / Edge)</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="row" style="margin-top:16px">
+      <button id="aiRunBtn" class="btn ai" type="button">✨ Generate AI Captions</button>
+      <button id="aiLoadBtn" class="btn" type="button">⬇ Preload Model</button>
+      <button id="aiStopBtn" class="btn ghost" type="button" disabled>■ Cancel</button>
+    </div>
+
+    <div class="ai-progress-wrap">
+      <div class="progress"><i id="aiProgressBar"></i></div>
+      <div class="ai-statusline">
+        <span id="aiStatus" class="ai-status">Model not loaded. Click “Generate AI Captions” to start.</span>
+        <span id="aiPercent" class="ai-percent">0%</span>
+      </div>
+    </div>
+
+    <div class="ai-live" id="aiLive" hidden>
+      <span class="ai-live-label">Live AI output</span>
+      <div class="ai-live-text" id="aiLiveText"></div>
+    </div>
+
+    <p class="hint">
+      First run downloads the model (cached afterwards). Whisper Tiny EN is fastest;
+      Whisper Base is more accurate. Multilingual models auto-use your
+      <b>Recognition language</b> setting above. Long files are chunked at 30 s with 5 s overlap.
+    </p>
+  </section>
+
+  <!-- OPTIONAL MEDIA -->
+  <section class="card">
+    <h2>Media file — for Whisper AI or speaker playback</h2>
+    <p class="desc">
+      Load an audio or video file. Use <b>Generate AI Captions</b> above for direct Whisper
+      transcription, or play it out loud through your speakers and use the live mic engine.
+    </p>
+
+    <div class="row">
+      <label class="field">
+        <span>Media file</span>
+        <input type="file" id="mediaFile" accept="audio/*,video/*" />
+      </label>
+      <button id="clearMedia" class="btn ghost" type="button" disabled>Remove file</button>
+    </div>
+
+    <p class="hint">
+      Whisper AI decodes audio directly from the file — no need to play it. Supported
+      containers depend on your browser (<code>mp3</code>, <code>wav</code>, <code>ogg</code>,
+      <code>m4a</code>, <code>mp4</code>, <code>webm</code>, <code>mov</code>, …).
+    </p>
+  </section>
+
+  <!-- TRANSCRIPT -->
+  <section class="card">
+    <h2>Transcript &amp; export</h2>
+    <p class="desc">Every finalized phrase is timestamped and stored below — mic and AI cues share one timeline.</p>
+
+    <div class="row">
+      <button id="srtBtn"  class="btn" type="button" disabled>⬇ Download .SRT</button>
+      <button id="vttBtn"  class="btn" type="button" disabled>⬇ Download .VTT</button>
+      <button id="copyBtn" class="btn ghost" type="button" disabled>⧉ Copy text</button>
+    </div>
+
+    <div id="transcript" class="transcript">
+      <div class="empty" id="emptyMsg">No captions yet.</div>
+      <div id="cueList"></div>
+    </div>
+
+    <div class="meta">
+      <span>Cues: <b id="cueCount">0</b></span>
+      <span>Words: <b id="wordCount">0</b></span>
+      <span>Duration: <b id="duration">00:00</b></span>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Live mic captioning uses the browser's built-in Web Speech API.
+  File transcription uses <b>Transformers.js</b> + <b>Whisper</b> running locally via WASM/WebGPU.
+  Neither requires an API key. Everything runs 100% client-side; your media never leaves the device.
+</footer>
+
+<!-- ================= GTRANSLATE ================= -->
+<script>
+  window.gtranslateSettings = {
+    "default_language": "en",
+    "detect_browser_language": true,
+    "wrapper_selector": ".gtranslate_wrapper",
+    "flag_size": 24,
+    "native_language_names": true,
+    "alt_flags": { "en": "usa" }
+  };
+</script>
+<script src="https://cdn.gtranslate.net/widgets/latest/dropdown.js" defer
+        onerror="window.__gtFailed=true;"></script>
+
+<!-- ================= CORE ENGINE ================= -->
+<script>
+(function () {
+  'use strict';
+
+  /* ============================================================
+     0) SYSTEM THEME ENGINE — full palette derivation
+     ============================================================ */
+  var THEMES = [
+    'corporate', 'cupcake', 'bumblebee', 'emerald', 'synthwave',
+    'retro', 'cyberpunk', 'valentine', 'halloween', 'garden',
+    'forest', 'aqua', 'lofi', 'pastel', 'fantasy',
+    'wireframe', 'black', 'luxury', 'dracula', 'cmyk',
+    'autumn', 'business', 'acid', 'lemonade', 'night',
+    'coffee', 'winter', 'dim', 'nord', 'sunset',
+    'caramellatte', 'abyss', 'silk'
+  ];
+
+  var currentTheme = 'corporate';
+  var customColors = {};
+
+  var THEME_SWATCHES = {
+    corporate:    ['#4b6bfb', '#7b92b2', '#67cba0', '#181a2a'],
+    cupcake:      ['#65c3c8', '#ef9fbc', '#eeaf3a', '#291334'],
+    bumblebee:    ['#e0a82e', '#f9d72f', '#181830', '#181830'],
+    emerald:      ['#66cc8a', '#377cfb', '#ea5234', '#333c4d'],
+    synthwave:    ['#e779c1', '#58c7f3', '#f3cc30', '#20134e'],
+    retro:        ['#ef9995', '#a4cbb4', '#ebdc99', '#7d7259'],
+    cyberpunk:    ['#ff7598', '#75d1f0', '#c07eec', '#423f00'],
+    valentine:    ['#e96d7b', '#a991f7', '#88dbdd', '#af4670'],
+    halloween:    ['#f28c18', '#6d3a9c', '#51a800', '#1b1d1d'],
+    garden:       ['#5c7f67', '#ecf4e7', '#fae5e5', '#5d5656'],
+    forest:       ['#1eb854', '#1fd65f', '#d99330', '#110e0e'],
+    aqua:         ['#09ecf3', '#966fb3', '#ffe999', '#3b8ea5'],
+    lofi:         ['#808080', '#4d4d4d', '#1a1a1a', '#000000'],
+    pastel:       ['#d1c1d7', '#f6cbd1', '#b4e9d6', '#70acc7'],
+    fantasy:      ['#6e0b75', '#007ebd', '#f8860d', '#1f2937'],
+    wireframe:    ['#b8b8b8', '#b8b8b8', '#b8b8b8', '#ebebeb'],
+    black:        ['#333333', '#333333', '#333333', '#141414'],
+    luxury:       ['#ffffff', '#152747', '#513448', '#331800'],
+    dracula:      ['#ff79c6', '#bd93f9', '#ffb86c', '#414558'],
+    cmyk:         ['#45aeee', '#e8488a', '#fff232', '#1a1a1a'],
+    autumn:       ['#8c0327', '#d85251', '#d59b6a', '#826a5c'],
+    business:     ['#1c4e80', '#7c909a', '#ea6947', '#23282e'],
+    acid:         ['#ff00ff', '#ff7f00', '#c4ff00', '#150f82'],
+    lemonade:     ['#519903', '#e9e92e', '#f7f9ca', '#191a3f'],
+    night:        ['#38bdf8', '#818cf8', '#f472b6', '#1e293b'],
+    coffee:       ['#db924b', '#263e3f', '#10576d', '#120c12'],
+    winter:       ['#047aff', '#463aa2', '#c148ac', '#021431'],
+    dim:          ['#9ca3af', '#6b7280', '#4b5563', '#374151'],
+    nord:         ['#5e81ac', '#81a1c1', '#88c0d0', '#4c566a'],
+    sunset:       ['#ff865b', '#fd6f9c', '#b387fa', '#1b1626'],
+    caramellatte: ['#d18f50', '#8e6844', '#b25828', '#3b2c23'],
+    abyss:        ['#0077b6', '#00b4d8', '#90e0ef', '#03045e'],
+    silk:         ['#ffc2d4', '#ffb5a7', '#fcd5ce', '#e8e8e4']
+  };
+
+  /* ---------- Colour utilities ---------- */
+  function hexToRgb(hex) {
+    if (!hex || typeof hex !== 'string') return { r: 0, g: 0, b: 0 };
+    var h = hex.replace('#', '').trim();
+    if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+    if (h.length !== 6) return { r: 0, g: 0, b: 0 };
+    return {
+      r: parseInt(h.substring(0, 2), 16) || 0,
+      g: parseInt(h.substring(2, 4), 16) || 0,
+      b: parseInt(h.substring(4, 6), 16) || 0
+    };
+  }
+  function rgbToHex(r, g, b) {
+    function c(x) {
+      var v = Math.max(0, Math.min(255, Math.round(x))).toString(16);
+      return v.length === 1 ? '0' + v : v;
+    }
+    return '#' + c(r) + c(g) + c(b);
+  }
+  function mix(c1, c2, alpha) {
+    var a = hexToRgb(c1);
+    var b = hexToRgb(c2);
+    return rgbToHex(
+      a.r * (1 - alpha) + b.r * alpha,
+      a.g * (1 - alpha) + b.g * alpha,
+      a.b * (1 - alpha) + b.b * alpha
+    );
+  }
+  function lighten(hex, amount) { return mix(hex, '#ffffff', amount); }
+  function darken(hex, amount)  { return mix(hex, '#000000', amount); }
+  function isLightColor(hex) {
+    var c = hexToRgb(hex);
+    var lum = (0.299 * c.r + 0.587 * c.g + 0.114 * c.b) / 255;
+    return lum > 0.55;
+  }
+
+  /* ---------- Apply theme palette to the whole UI ---------- */
+  function applyThemePalette(themeName) {
+    var sw = THEME_SWATCHES[themeName] || THEME_SWATCHES.corporate;
+    var primary   = sw[0];
+    var secondary = sw[1];
+    var accent    = sw[2];
+    var neutral   = sw[3];
+
+    /* Force dark: derive a dark base from neutral regardless of lightness */
+    var base;
+    if (isLightColor(neutral)) {
+      base = darken(neutral, 0.88);
+    } else {
+      base = darken(neutral, 0.45);
+    }
+    /* Guarantee we're never *too* black */
+    var baseLum = hexToRgb(base);
+    if (baseLum.r + baseLum.g + baseLum.b < 12) {
+      base = darken(neutral, 0.25);
+    }
+
+    var panel   = lighten(base, 0.05);
+    var panel2  = lighten(base, 0.03);
+    var panel3  = lighten(base, 0.09);
+    var border  = lighten(base, 0.16);
+    var borderSoft = lighten(base, 0.10);
+    var text    = '#e9edf3';
+    var muted   = lighten(base, 0.52);
+
+    var root = document.documentElement;
+    root.style.setProperty('--theme-bg', base);
+    root.style.setProperty('--theme-panel', panel);
+    root.style.setProperty('--theme-panel-2', panel2);
+    root.style.setProperty('--theme-panel-3', panel3);
+    root.style.setProperty('--theme-border', border);
+    root.style.setProperty('--theme-border-soft', borderSoft);
+    root.style.setProperty('--theme-text', text);
+    root.style.setProperty('--theme-muted', muted);
+    root.style.setProperty('--theme-primary', primary);
+    root.style.setProperty('--theme-secondary', secondary);
+    root.style.setProperty('--theme-accent', accent);
+    root.style.setProperty('--theme-danger', '#f85149');
+    root.style.setProperty('--theme-success', '#3fb950');
+    root.style.setProperty('--theme-glow', 'rgba(' +
+      hexToRgb(primary).r + ',' + hexToRgb(primary).g + ',' + hexToRgb(primary).b + ',0.28)');
+  }
+
+  /* ---------- Apply / persist theme ---------- */
+  function applySystemTheme(theme) {
+    currentTheme = theme;
+    document.documentElement.setAttribute('data-theme', theme);
+    document.querySelectorAll('.theme-card').forEach(function (card) {
+      card.classList.toggle('active', card.dataset.theme === theme);
+    });
+    try { localStorage.setItem('neon-theme', theme); } catch (_) {}
+
+    /* Clear custom overrides when switching theme */
+    customColors = {};
+    try { localStorage.removeItem('neon-custom-colors'); } catch (_) {}
+
+    applyThemePalette(theme);
+
+    /* Repopulate colour pickers from current palette */
+    var sw = THEME_SWATCHES[theme] || THEME_SWATCHES.corporate;
+    var cp  = document.getElementById('customPrimary');
+    var cs  = document.getElementById('customSecondary');
+    var ca  = document.getElementById('customAccent');
+    var cn  = document.getElementById('customNeutral');
+    var cb  = document.getElementById('customBg');
+    var cpa = document.getElementById('customPanel');
+    var cbo = document.getElementById('customBorder');
+    var ctx = document.getElementById('customText');
+    var cmu = document.getElementById('customMuted');
+
+    if (cp)  cp.value  = sw[0];
+    if (cs)  cs.value  = sw[1];
+    if (ca)  ca.value  = sw[2];
+    if (cn)  cn.value  = sw[3];
+
+    /* Read back computed values */
+    var computed = getComputedStyle(document.documentElement);
+    function cvar(name) { return computed.getPropertyValue(name).trim(); }
+    if (cb)  cb.value  = cvar('--theme-bg')     || '#0d1117';
+    if (cpa) cpa.value = cvar('--theme-panel')  || '#161b22';
+    if (cbo) cbo.value = cvar('--theme-border') || '#30363d';
+    if (ctx) ctx.value = cvar('--theme-text')   || '#e6edf3';
+    if (cmu) cmu.value = cvar('--theme-muted')  || '#8b949e';
+  }
+
+  /* ---------- Apply custom colours on top ---------- */
+  function applyCustomColors(colors) {
+    customColors = colors;
+    var root = document.documentElement;
+    for (var key in colors) {
+      if (Object.prototype.hasOwnProperty.call(colors, key) && colors[key]) {
+        root.style.setProperty('--' + key, colors[key]);
+      }
+    }
+    try { localStorage.setItem('neon-custom-colors', JSON.stringify(colors)); } catch (_) {}
+  }
+
+  function resetSystemTheme() {
+    applySystemTheme('corporate');
+    var sub = document.getElementById('customSubColor');
+    var int = document.getElementById('customInterimColor');
+    if (sub) sub.value = '#ffffff';
+    if (int) int.value = '#c9d1d9';
+    document.documentElement.style.setProperty('--sub-color', '#ffffff');
+    document.documentElement.style.setProperty('--sub-interim-color', '#c9d1d9');
+    try {
+      localStorage.removeItem('neon-sub-color');
+      localStorage.removeItem('neon-sub-interim');
+    } catch (_) {}
+  }
+
+  /* ---------- Build theme gallery ---------- */
+  function buildThemeGallery() {
+    var container = document.getElementById('themeGallery');
+    if (!container) return;
+    container.innerHTML = '';
+    THEMES.forEach(function (theme) {
+      var colors = THEME_SWATCHES[theme] || THEME_SWATCHES.corporate;
+      var card = document.createElement('div');
+      card.className = 'theme-card' + (theme === currentTheme ? ' active' : '');
+      card.dataset.theme = theme;
+
+      var strip = document.createElement('div');
+      strip.className = 'swatch-strip';
+      colors.forEach(function (c) {
+        var span = document.createElement('span');
+        span.style.background = c;
+        strip.appendChild(span);
+      });
+      card.appendChild(strip);
+
+      var label = document.createElement('span');
+      label.className = 'theme-label';
+      label.textContent = theme;
+
+      var check = document.createElement('span');
+      check.className = 'check';
+      check.textContent = ' ✓';
+      label.appendChild(check);
+      card.appendChild(label);
+
+      card.addEventListener('click', function () { applySystemTheme(theme); });
+      container.appendChild(card);
+    });
+  }
+
+  /* ---------- Wire up theme toggle & colour panel ---------- */
+  var themeToggle = document.getElementById('themeToggle');
+  var themeGallery = document.getElementById('themeGallery');
+  var customColorsPanel = document.getElementById('customColors');
+
+  if (themeToggle && themeGallery && customColorsPanel) {
+    themeToggle.addEventListener('click', function () {
+      var isOpen = themeGallery.classList.toggle('open');
+      customColorsPanel.classList.toggle('open', isOpen);
+      themeToggle.textContent = isOpen
+        ? '🎨 System Theme & Colors ▴'
+        : '🎨 System Theme & Colors ▾';
+    });
+  }
+
+  var colorInputs = {
+    customPrimary:    'theme-primary',
+    customSecondary:  'theme-secondary',
+    customAccent:     'theme-accent',
+    customBg:         'theme-bg',
+    customPanel:      'theme-panel',
+    customBorder:     'theme-border',
+    customText:       'theme-text',
+    customMuted:      'theme-muted'
+  };
+
+  function applyCustomFromInputs() {
+    var colors = {};
+    for (var id in colorInputs) {
+      if (Object.prototype.hasOwnProperty.call(colorInputs, id)) {
+        var input = document.getElementById(id);
+        if (input) colors[colorInputs[id]] = input.value;
+      }
+    }
+    /* Also propagate sensible derived vars so panels/borders update */
+    if (colors['theme-bg']) {
+      colors['theme-panel']   = colors['theme-panel']   || lighten(colors['theme-bg'], 0.05);
+      colors['theme-panel-2'] = lighten(colors['theme-bg'], 0.03);
+      colors['theme-panel-3'] = lighten(colors['theme-bg'], 0.09);
+    }
+    if (colors['theme-border']) {
+      colors['theme-border-soft'] = lighten(colors['theme-border'], -0.05);
+    }
+    if (colors['theme-primary']) {
+      var p = hexToRgb(colors['theme-primary']);
+      colors['theme-glow'] = 'rgba(' + p.r + ',' + p.g + ',' + p.b + ',0.28)';
+    }
+    applyCustomColors(colors);
+
+    var subColor = document.getElementById('customSubColor');
+    var interimColor = document.getElementById('customInterimColor');
+    if (subColor) {
+      document.documentElement.style.setProperty('--sub-color', subColor.value);
+      try { localStorage.setItem('neon-sub-color', subColor.value); } catch (_) {}
+    }
+    if (interimColor) {
+      document.documentElement.style.setProperty('--sub-interim-color', interimColor.value);
+      try { localStorage.setItem('neon-sub-interim', interimColor.value); } catch (_) {}
+    }
+  }
+
+  var applyBtn = document.getElementById('applyColors');
+  if (applyBtn) applyBtn.addEventListener('click', applyCustomFromInputs);
+
+  var resetBtn = document.getElementById('resetColors');
+  if (resetBtn) resetBtn.addEventListener('click', function () { resetSystemTheme(); });
+
+  /* Persist subtitle colours live */
+  var scEl = document.getElementById('customSubColor');
+  var icEl = document.getElementById('customInterimColor');
+  if (scEl) scEl.addEventListener('input', function () {
+    document.documentElement.style.setProperty('--sub-color', scEl.value);
+    try { localStorage.setItem('neon-sub-color', scEl.value); } catch (_) {}
+  });
+  if (icEl) icEl.addEventListener('input', function () {
+    document.documentElement.style.setProperty('--sub-interim-color', icEl.value);
+    try { localStorage.setItem('neon-sub-interim', icEl.value); } catch (_) {}
+  });
+
+  /* ---------- Restore saved state ---------- */
+  try {
+    var savedTheme = localStorage.getItem('neon-theme');
+    if (savedTheme && THEMES.indexOf(savedTheme) !== -1) currentTheme = savedTheme;
+    var savedColors = localStorage.getItem('neon-custom-colors');
+    if (savedColors) customColors = JSON.parse(savedColors);
+    var savedSub = localStorage.getItem('neon-sub-color');
+    var savedInt = localStorage.getItem('neon-sub-interim');
+    if (savedSub) document.documentElement.style.setProperty('--sub-color', savedSub);
+    if (savedInt) document.documentElement.style.setProperty('--sub-interim-color', savedInt);
+    if (scEl && savedSub) scEl.value = savedSub;
+    if (icEl && savedInt) icEl.value = savedInt;
+  } catch (_) {}
+
+  applySystemTheme(currentTheme);
+  buildThemeGallery();
+
+  /* Re-apply stored custom colours AFTER the theme palette is applied */
+  if (Object.keys(customColors).length > 0) {
+    applyCustomColors(customColors);
+    /* Also sync pickers */
+    var pickerMap = {
+      'theme-primary':   'customPrimary',
+      'theme-secondary': 'customSecondary',
+      'theme-accent':    'customAccent',
+      'theme-bg':        'customBg',
+      'theme-panel':     'customPanel',
+      'theme-border':    'customBorder',
+      'theme-text':      'customText',
+      'theme-muted':     'customMuted'
+    };
+    for (var k in pickerMap) {
+      if (customColors[k]) {
+        var inp = document.getElementById(pickerMap[k]);
+        if (inp) inp.value = customColors[k];
+      }
+    }
+  }
+
+  /* ============================================================
+     1) Shared element cache
+     ============================================================ */
+  var $ = function (id) { return document.getElementById(id); };
+
+  var el = {
+    lang:        $('lang'),
+    startBtn:    $('startBtn'),
+    stopBtn:     $('stopBtn'),
+    clearBtn:    $('clearBtn'),
+    status:      $('status'),
+    statusText:  $('statusText'),
+    stage:       $('stage'),
+    placeholder: $('stagePlaceholder'),
+    phText:      $('phText'),
+    player:      $('player'),
+    subFinal:    $('subFinal'),
+    subInterim:  $('subInterim'),
+    transcript:  $('transcript'),
+    emptyMsg:    $('emptyMsg'),
+    cueList:     $('cueList'),
+    srtBtn:      $('srtBtn'),
+    vttBtn:      $('vttBtn'),
+    copyBtn:     $('copyBtn'),
+    cueCount:    $('cueCount'),
+    wordCount:   $('wordCount'),
+    durationEl:  $('duration'),
+    mediaFile:   $('mediaFile'),
+    clearMedia:  $('clearMedia'),
+    supportWarn: $('supportWarn'),
+    secureWarn:  $('secureWarn'),
+    gtWrapper:   $('gtWrapper')
+  };
+
+  /* ============================================================
+     2) Environment checks
+     ============================================================ */
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var SR_OK = !!SR;
+
+  if (!SR_OK) {
+    if (el.supportWarn) el.supportWarn.classList.add('show');
+    if (el.startBtn) el.startBtn.disabled = true;
+    if (el.lang) el.lang.disabled = true;
+  }
+
+  if (SR_OK && !window.isSecureContext && el.secureWarn) {
+    el.secureWarn.classList.add('show');
+  }
+
+  setTimeout(function () {
+    if (el.gtWrapper && el.gtWrapper.children.length === 0) {
+      var a = document.createElement('a');
+      a.className = 'gt-fallback';
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.href = 'https://translate.google.com/translate?sl=auto&tl=es&u=' +
+               encodeURIComponent(location.href);
+      a.textContent = '🌐 Translate page';
+      el.gtWrapper.appendChild(a);
+    }
+  }, 2500);
+
+  /* ============================================================
+     3) State
+     ============================================================ */
+  var state = {
+    wantActive: false,
+    currentRec: null,
+    restartTimer: null,
+    segments: [],
+    offset: 0,
+    sessionStart: 0,
+    lastEnd: 0
+  };
+
+  /* ============================================================
+     4) Time helpers
+     ============================================================ */
+  function pad(n, len) { return String(n).padStart(len || 2, '0'); }
+
+  function elapsed() {
+    return state.offset + (performance.now() - state.sessionStart) / 1000;
+  }
+
+  function ts(sec, sep) {
+    sec = Math.max(0, sec);
+    var h  = Math.floor(sec / 3600);
+    var m  = Math.floor((sec % 3600) / 60);
+    var s  = Math.floor(sec % 60);
+    var ms = Math.round((sec - Math.floor(sec)) * 1000);
+    if (ms === 1000) ms = 999;
+    return pad(h) + ':' + pad(m) + ':' + pad(s) + sep + pad(ms, 3);
+  }
+
+  function shortTime(sec) {
+    sec = Math.max(0, sec);
+    var m = Math.floor(sec / 60);
+    var s = Math.floor(sec % 60);
+    return pad(m) + ':' + pad(s);
+  }
+
+  /* ============================================================
+     5) UI helpers
+     ============================================================ */
+  function setStatus(kind, text) {
+    if (!el.status || !el.statusText) return;
+    el.status.className = 'status' + (kind ? ' ' + kind : '');
+    el.statusText.textContent = text;
+  }
+
+  function refreshButtons() {
+    if (el.startBtn) el.startBtn.disabled = state.wantActive || !SR_OK;
+    if (el.stopBtn)  el.stopBtn.disabled  = !state.wantActive;
+    var has = state.segments.length > 0;
+    if (el.srtBtn)  el.srtBtn.disabled  = !has;
+    if (el.vttBtn)  el.vttBtn.disabled  = !has;
+    if (el.copyBtn) el.copyBtn.disabled = !has;
+  }
+
+  function refreshStats() {
+    var words = 0;
+    for (var i = 0; i < state.segments.length; i++) {
+      words += state.segments[i].text.split(/\s+/).filter(Boolean).length;
+    }
+    if (el.cueCount)  el.cueCount.textContent  = state.segments.length;
+    if (el.wordCount) el.wordCount.textContent = words;
+    var last = state.segments[state.segments.length - 1];
+    if (el.durationEl) el.durationEl.textContent = shortTime(last ? last.end : 0);
+  }
+
+  /* ============================================================
+     6) Transcript rendering
+     ============================================================ */
+  function makeSegmentEl(seg) {
+    var row = document.createElement('div');
+    row.className = 'seg';
+
+    var t = document.createElement('span');
+    t.className = 'seg-time';
+    t.textContent = shortTime(seg.start) + ' → ' + shortTime(seg.end);
+
+    var x = document.createElement('span');
+    x.className = 'seg-text';
+    x.textContent = seg.text;
+
+    row.appendChild(t);
+    row.appendChild(x);
+
+    if (seg.source === 'ai') {
+      var badge = document.createElement('span');
+      badge.className = 'seg-src';
+      badge.textContent = 'AI';
+      row.appendChild(badge);
+    }
+    return row;
+  }
+
+  function updateSegmentEl(seg) {
+    if (!seg.el) return;
+    var txt = seg.el.querySelector('.seg-text');
+    var tim = seg.el.querySelector('.seg-time');
+    if (txt) txt.textContent = seg.text;
+    if (tim) tim.textContent = shortTime(seg.start) + ' → ' + shortTime(seg.end);
+  }
+
+  function removeEmptyMsg() {
+    if (el.emptyMsg && el.emptyMsg.parentNode) el.emptyMsg.remove();
+  }
+
+  function ensureEmptyMsg(text) {
+    if (!el.emptyMsg) {
+      el.emptyMsg = document.createElement('div');
+      el.emptyMsg.className = 'empty';
+      el.emptyMsg.id = 'emptyMsg';
+    }
+    el.emptyMsg.textContent = text || 'No captions yet.';
+    if (el.transcript && el.emptyMsg.parentNode !== el.transcript) {
+      el.transcript.insertBefore(el.emptyMsg, el.cueList);
+    }
+  }
+
+  function showLatestSubtitle() {
+    var last = state.segments[state.segments.length - 1];
+    if (last && el.subFinal) {
+      el.subFinal.classList.remove('placeholder');
+      el.subFinal.textContent = last.text;
+    }
+  }
+
+  /* ============================================================
+     7) Add / merge a final phrase (mic path)
+     ============================================================ */
+  function finalize(text) {
+    text = String(text || '').replace(/\s+/g, ' ').trim();
+    if (!text) return;
+
+    var end = elapsed();
+    var start = state.lastEnd;
+    if (end <= start) start = Math.max(0, end - 0.7);
+
+    var prev = state.segments[state.segments.length - 1];
+
+    var canMerge =
+      prev &&
+      prev.source !== 'ai' &&
+      (start - prev.end) < 0.9 &&
+      (prev.text.length + text.length) < 120 &&
+      !/[.!?…।]$/.test(prev.text);
+
+    if (canMerge) {
+      prev.text = (prev.text + ' ' + text).trim();
+      prev.end  = end;
+      updateSegmentEl(prev);
+    } else {
+      var seg = { start: start, end: end, text: text, el: null, source: 'mic' };
+      state.segments.push(seg);
+      seg.el = makeSegmentEl(seg);
+      removeEmptyMsg();
+      el.cueList.appendChild(seg.el);
+    }
+
+    state.lastEnd = end;
+    showLatestSubtitle();
+    if (el.subInterim) el.subInterim.textContent = '';
+    if (el.transcript) el.transcript.scrollTop = el.transcript.scrollHeight;
+
+    refreshStats();
+    refreshButtons();
+  }
+
+  /* ============================================================
+     8) Recognition lifecycle
+     ============================================================ */
+  function handleError(ev) {
+    var err = ev && ev.error;
+    if (err === 'no-speech' || err === 'aborted') return;
+
+    if (err === 'not-allowed' || err === 'service-not-allowed') {
+      setStatus('error', 'Microphone blocked');
+      stopAll();
+      if (el.secureWarn) el.secureWarn.classList.add('show');
+      return;
+    }
+    if (err === 'audio-capture') {
+      setStatus('error', 'No microphone');
+      stopAll();
+      return;
+    }
+    if (err === 'network') {
+      setStatus('error', 'Network error');
+      return;
+    }
+    setStatus('error', 'Error: ' + err);
+  }
+
+  function spinUp() {
+    if (!SR_OK || !state.wantActive) return;
+
+    clearTimeout(state.restartTimer);
+
+    var rec = new SR();
+    state.currentRec = rec;
+
+    rec.continuous      = true;
+    rec.interimResults  = true;
+    rec.maxAlternatives = 1;
+    rec.lang            = el.lang.value;
+
+    var processed = (typeof WeakSet !== 'undefined') ? new WeakSet() : null;
+
+    rec.onstart = function () {
+      setStatus('listening', 'Listening…');
+      if (el.stage) el.stage.classList.add('listening');
+      if (el.phText) el.phText.textContent = 'Listening… speak now';
+    };
+
+    rec.onresult = function (ev) {
+      var interim = '';
+
+      for (var i = ev.resultIndex; i < ev.results.length; i++) {
+        var res = ev.results[i];
+        var txt = res[0].transcript;
+
+        if (res.isFinal) {
+          if (processed) {
+            if (processed.has(res)) continue;
+            processed.add(res);
+          }
+          var clean = String(txt || '').replace(/\s+/g, ' ').trim();
+          if (clean) finalize(clean);
+        } else {
+          interim += txt;
+        }
+      }
+
+      if (el.subInterim) el.subInterim.textContent = interim;
+    };
+
+    rec.onerror = handleError;
+
+    rec.onend = function () {
+      if (el.subInterim) el.subInterim.textContent = '';
+
+      if (!state.wantActive) {
+        if (el.stage) el.stage.classList.remove('listening');
+        setStatus('idle', 'Stopped');
+        return;
+      }
+
+      clearTimeout(state.restartTimer);
+      state.restartTimer = setTimeout(spinUp, 260);
+    };
+
+    try {
+      rec.start();
+    } catch (e) {
+      clearTimeout(state.restartTimer);
+      state.restartTimer = setTimeout(spinUp, 480);
+    }
+  }
+
+  /* ============================================================
+     9) Start / stop / stopAll
+     ============================================================ */
+  function start() {
+    if (!SR_OK || state.wantActive) return;
+
+    if (!window.isSecureContext) {
+      if (el.secureWarn) el.secureWarn.classList.add('show');
+      setStatus('error', 'Insecure context');
+      return;
+    }
+
+    state.wantActive = true;
+
+    var last = state.segments[state.segments.length - 1];
+    state.offset       = last ? last.end + 0.25 : 0;
+    state.lastEnd      = state.offset;
+    state.sessionStart = performance.now();
+
+    spinUp();
+    refreshButtons();
+  }
+
+  function stopAll() {
+    state.wantActive = false;
+    clearTimeout(state.restartTimer);
+
+    if (state.currentRec) {
+      try { state.currentRec.abort(); } catch (e) {}
+      state.currentRec = null;
+    }
+
+    if (el.subInterim) el.subInterim.textContent = '';
+    if (el.stage) el.stage.classList.remove('listening');
+    if (el.phText) el.phText.textContent = 'Press “Start listening” and begin speaking…';
+    setStatus('idle', 'Stopped');
+    refreshButtons();
+  }
+
+  function stop() {
+    if (!state.wantActive) return;
+    stopAll();
+  }
+
+  /* ============================================================
+     10) Export builders
+     ============================================================ */
+  function buildSRT() {
+    return '\uFEFF' + state.segments.map(function (s, i) {
+      var start = ts(s.start, ',');
+      var end   = ts(Math.max(s.end, s.start + 0.5), ',');
+      return (i + 1) + '\n' + start + ' --> ' + end + '\n' + s.text + '\n';
+    }).join('\n');
+  }
+
+  function buildVTT() {
+    var body = state.segments.map(function (s, i) {
+      var start = ts(s.start, '.');
+      var end   = ts(Math.max(s.end, s.start + 0.5), '.');
+      return (i + 1) + '\n' + start + ' --> ' + end + '\n' + s.text + '\n';
+    }).join('\n');
+    return 'WEBVTT\n\n' + body;
+  }
+
+  function download(filename, content, mime) {
+    var blob = new Blob([content], { type: (mime || 'text/plain') + ';charset=utf-8' });
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+  }
+
+  function stamp() {
+    var d = new Date();
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) +
+           '_' + pad(d.getHours()) + '-' + pad(d.getMinutes()) + '-' + pad(d.getSeconds());
+  }
+
+  /* ============================================================
+     11) Public API for the AI module
+     ============================================================ */
+  function pushSegments(segs, source) {
+    if (!segs || !segs.length) return 0;
+    var added = 0;
+    removeEmptyMsg();
+
+    for (var i = 0; i < segs.length; i++) {
+      var s = segs[i];
+      var text = String(s.text || '').replace(/\s+/g, ' ').trim();
+      if (!text) continue;
+
+      var start = Number.isFinite(s.start) ? Math.max(0, s.start) : 0;
+      var end   = Number.isFinite(s.end) && s.end > start ? s.end : start + 1.2;
+
+      var seg = { start: start, end: end, text: text, el: null, source: source || 'ai' };
+      state.segments.push(seg);
+      seg.el = makeSegmentEl(seg);
+      el.cueList.appendChild(seg.el);
+      added++;
+    }
+
+    if (!added) return 0;
+
+    var last = state.segments[state.segments.length - 1];
+    state.lastEnd = last.end;
+    state.offset  = last.end + 0.25;
+
+    showLatestSubtitle();
+    if (el.transcript) el.transcript.scrollTop = el.transcript.scrollHeight;
+
+    refreshStats();
+    refreshButtons();
+    return added;
+  }
+
+  function clearAll() {
+    stopAll();
+    state.segments = [];
+    state.offset = 0;
+    state.lastEnd = 0;
+    if (el.cueList) el.cueList.innerHTML = '';
+    ensureEmptyMsg('No captions yet.');
+    if (el.subFinal) {
+      el.subFinal.textContent = 'Press “Start listening” and begin speaking…';
+      el.subFinal.classList.add('placeholder');
+    }
+    if (el.subInterim) el.subInterim.textContent = '';
+    refreshStats();
+    refreshButtons();
+  }
+
+  function getMediaFile() {
+    if (!el.mediaFile || !el.mediaFile.files) return null;
+    return el.mediaFile.files[0] || null;
+  }
+
+  function getTargetLanguage() {
+    var v = (el.lang && el.lang.value) || 'en-US';
+    return v.split('-')[0] || 'en';
+  }
+
+  window.HEX = {
+    pushSegments: pushSegments,
+    clearAll: clearAll,
+    getSegments: function () { return state.segments; },
+    getMediaFile: getMediaFile,
+    getTargetLanguage: getTargetLanguage,
+    setStatus: setStatus,
+    refreshStats: refreshStats,
+    refreshButtons: refreshButtons,
+    download: download,
+    stamp: stamp,
+    buildSRT: buildSRT,
+    buildVTT: buildVTT
+  };
+
+  /* ============================================================
+     12) UI events
+     ============================================================ */
+  if (el.startBtn) el.startBtn.addEventListener('click', start);
+  if (el.stopBtn)  el.stopBtn.addEventListener('click', stop);
+
+  if (el.clearBtn) {
+    el.clearBtn.addEventListener('click', function () { clearAll(); });
+  }
+
+  if (el.srtBtn) {
+    el.srtBtn.addEventListener('click', function () {
+      if (!state.segments.length) return;
+      download('captions_' + stamp() + '.srt', buildSRT(), 'application/x-subrip');
+    });
+  }
+
+  if (el.vttBtn) {
+    el.vttBtn.addEventListener('click', function () {
+      if (!state.segments.length) return;
+      download('captions_' + stamp() + '.vtt', buildVTT(), 'text/vtt');
+    });
+  }
+
+  if (el.copyBtn) {
+    el.copyBtn.addEventListener('click', function () {
+      if (!state.segments.length) return;
+      var text = state.segments.map(function (s) { return s.text; }).join('\n');
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () {
+          var old = el.copyBtn.textContent;
+          el.copyBtn.textContent = '✓ Copied!';
+          setTimeout(function () { el.copyBtn.textContent = old; }, 1400);
+        });
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        ta.remove();
+      }
+    });
+  }
+
+  if (el.lang) {
+    el.lang.addEventListener('change', function () {
+      if (!state.wantActive) return;
+      var wasActive = state.wantActive;
+      stopAll();
+      if (wasActive) setTimeout(start, 420);
+    });
+  }
+
+  /* ============================================================
+     13) Optional media file
+     ============================================================ */
+  if (el.mediaFile) {
+    el.mediaFile.addEventListener('change', function (e) {
+      var f = e.target.files && e.target.files[0];
+      if (!f) return;
+
+      if (el.player.src) URL.revokeObjectURL(el.player.src);
+      el.player.src = URL.createObjectURL(f);
+      el.player.hidden = false;
+      if (el.placeholder) el.placeholder.style.display = 'none';
+      if (el.clearMedia) el.clearMedia.disabled = false;
+      el.player.load();
+
+      window.dispatchEvent(new CustomEvent('hex-media-change', { detail: { file: f } }));
+    });
+  }
+
+  if (el.clearMedia) {
+    el.clearMedia.addEventListener('click', function () {
+      if (el.player.src) URL.revokeObjectURL(el.player.src);
+      el.player.removeAttribute('src');
+      el.player.load();
+      el.player.hidden = true;
+      if (el.placeholder) el.placeholder.style.display = '';
+      el.clearMedia.disabled = true;
+      if (el.mediaFile) el.mediaFile.value = '';
+
+      window.dispatchEvent(new CustomEvent('hex-media-change', { detail: { file: null } }));
+    });
+  }
+
+  /* ============================================================
+     14) Cleanup on unload
+     ============================================================ */
+  window.addEventListener('beforeunload', function () {
+    state.wantActive = false;
+    if (state.currentRec) {
+      try { state.currentRec.abort(); } catch (e) {}
+    }
+  });
+
+  /* ============================================================
+     15) Init
+     ============================================================ */
+  refreshButtons();
+  refreshStats();
+  setStatus('idle', 'Idle');
+
+})();
+</script>
+
+<!-- ================= WHISPER AI MODULE ================= -->
+<script type="module">
+(async function () {
+  'use strict';
+
+  const $ = (id) => document.getElementById(id);
+
+  const aiModelSel  = $('aiModel');
+  const aiDeviceSel = $('aiDevice');
+  const aiLoadBtn   = $('aiLoadBtn');
+  const aiRunBtn    = $('aiRunBtn');
+  const aiStopBtn   = $('aiStopBtn');
+  const aiProgress  = $('aiProgressBar');
+  const aiStatusEl  = $('aiStatus');
+  const aiPercentEl = $('aiPercent');
+  const aiPill      = $('aiPill');
+  const aiLive      = $('aiLive');
+  const aiLiveText  = $('aiLiveText');
+
+  /* ------------------------------------------------------------
+     Wait for window.HEX to exist (the core script may still be parsing)
+     ------------------------------------------------------------ */
+  function waitForHex(timeoutMs) {
+    return new Promise((resolve, reject) => {
+      const start = Date.now();
+      (function poll() {
+        if (window.HEX && typeof window.HEX.pushSegments === 'function') {
+          resolve(window.HEX);
+        } else if (Date.now() - start > (timeoutMs || 5000)) {
+          reject(new Error('Core engine not available.'));
+        } else {
+          setTimeout(poll, 40);
+        }
+      })();
+    });
+  }
+
+  let HEX = null;
+  try {
+    HEX = await waitForHex(6000);
+  } catch (err) {
+    console.error('[HEX AI]', err);
+    setAiStatus('Core engine not ready — reload the page.', 'err');
+    return;
+  }
+
+  /* ------------------------------------------------------------
+     UI helpers
+     ------------------------------------------------------------ */
+  function setAiStatus(text, kind) {
+    if (!aiStatusEl) return;
+    aiStatusEl.textContent = text;
+    aiStatusEl.className = 'ai-status' + (kind ? ' ' + kind : '');
+  }
+  function setAiPercent(pct) {
+    const v = Math.max(0, Math.min(100, Math.round(pct)));
+    if (aiPercentEl) aiPercentEl.textContent = v + '%';
+    if (aiProgress) {
+      aiProgress.classList.remove('indeterminate');
+      aiProgress.style.width = v + '%';
+    }
+  }
+  function setAiIndeterminate() {
+    if (aiPercentEl) aiPercentEl.textContent = '…';
+    if (aiProgress) {
+      aiProgress.style.width = '';
+      aiProgress.classList.add('indeterminate');
+    }
+  }
+  function setPill(text, kind) {
+    if (!aiPill) return;
+    aiPill.textContent = text;
+    aiPill.className = 'ai-pill' + (kind ? ' ' + kind : '');
+  }
+  function showLive(show) { if (aiLive) aiLive.hidden = !show; }
+  function setLiveText(t) {
+    if (aiLiveText) {
+      aiLiveText.textContent = t;
+      aiLiveText.scrollTop = aiLiveText.scrollHeight;
+    }
+  }
+  function appendLiveText(t) {
+    if (aiLiveText) {
+      aiLiveText.textContent = (aiLiveText.textContent || '') + t;
+      aiLiveText.scrollTop = aiLiveText.scrollHeight;
+    }
+  }
+
+  /* ------------------------------------------------------------
+     Transformers.js loading (dynamic import, cached)
+     ------------------------------------------------------------ */
+  let pipeline = null;
+  let env = null;
+  let tfReady = false;
+  let tfError = null;
+  let tfLoading = null;
+
+  const TF_CDN = 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
+
+  async function loadTransformers() {
+    if (tfReady) return true;
+    if (tfLoading) return tfLoading;
+    if (tfError) throw tfError;
+
+    tfLoading = (async () => {
+      try {
+        const mod = await import(TF_CDN);
+        pipeline = mod.pipeline;
+        env = mod.env;
+
+        /* Force remote-only loading + browser cache */
+        env.allowLocalModels = false;
+        env.allowRemoteModels = true;
+        env.useBrowserCache = true;
+
+        /* Single-threaded WASM for maximum compatibility */
+        if (env.backends && env.backends.onnx && env.backends.onnx.wasm) {
+          env.backends.onnx.wasm.numThreads = 1;
+        }
+
+        tfReady = true;
+        return true;
+      } catch (err) {
+        tfError = err;
+        throw err;
+      } finally {
+        tfLoading = null;
+      }
+    })();
+
+    return tfLoading;
+  }
+
+  /* ------------------------------------------------------------
+     Progress tracking
+     ------------------------------------------------------------ */
+  const fileProgress = new Map();
+
+  function resetProgress() {
+    fileProgress.clear();
+    setAiPercent(0);
+  }
+
+  function formatMB(bytes) {
+    if (!bytes) return '0 MB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+  function onProgress(p) {
+    if (!p || !p.status) return;
+
+    if (p.status === 'initiate') {
+      if (p.file) fileProgress.set(p.file, { loaded: 0, total: 0 });
+      setAiStatus('Initialising ' + (p.file || 'model') + '…', 'busy');
+      return;
+    }
+
+    if (p.status === 'download') {
+      if (p.file && !fileProgress.has(p.file)) {
+        fileProgress.set(p.file, { loaded: 0, total: 0 });
+      }
+      setAiStatus('Downloading ' + (p.file || 'model') + '…', 'busy');
+      return;
+    }
+
+    if (p.status === 'progress') {
+      if (p.file) {
+        fileProgress.set(p.file, {
+          loaded: p.loaded || 0,
+          total: p.total || 0
+        });
+      }
+      let loaded = 0, total = 0;
+      fileProgress.forEach((v) => {
+        loaded += v.loaded || 0;
+        total  += v.total  || 0;
+      });
+      const pct = total > 0 ? (loaded / total) * 100 : 0;
+      setAiPercent(pct);
+      setAiStatus(
+        'Fetching weights… ' +
+        (total > 0 ? formatMB(loaded) + ' / ' + formatMB(total) : (p.file || '')),
+        'busy'
+      );
+      return;
+    }
+
+    if (p.status === 'done') {
+      if (p.file) {
+        const cur = fileProgress.get(p.file) || { loaded: 0, total: 0 };
+        fileProgress.set(p.file, { loaded: cur.total || cur.loaded, total: cur.total || cur.loaded });
+      }
+      setAiStatus('Cached ' + (p.file || 'file'), 'busy');
+      return;
+    }
+
+    if (p.status === 'ready') {
+      setAiPercent(100);
+      setAiStatus('Model ready ✓', 'ok');
+      return;
+    }
+  }
+
+  /* ------------------------------------------------------------
+     Model cache
+     ------------------------------------------------------------ */
+  let transcriber = null;
+  let loadedModelId = null;
+  let loadedDevice = null;
+  let isLoadingModel = false;
+  let loadPromise = null;
+
+  async function loadModel(forceReload) {
+    const modelId = aiModelSel ? aiModelSel.value : 'Xenova/whisper-tiny.en';
+    const device  = aiDeviceSel ? aiDeviceSel.value : 'wasm';
+
+    if (!forceReload && transcriber && loadedModelId === modelId && loadedDevice === device) {
+      setAiStatus('Model already loaded ✓', 'ok');
+      setAiPercent(100);
+      setPill('Ready', 'ready');
+      return transcriber;
+    }
+
+    if (loadPromise) return loadPromise;
+
+    loadPromise = (async () => {
+      isLoadingModel = true;
+      if (aiLoadBtn) aiLoadBtn.disabled = true;
+      if (aiRunBtn)  aiRunBtn.disabled  = true;
+      if (aiStopBtn) aiStopBtn.disabled = false;
+
+      resetProgress();
+      setAiIndeterminate();
+      setAiStatus('Loading Transformers.js runtime…', 'busy');
+      setPill('Loading…', 'busy');
+      showLive(true);
+      setLiveText('Loading AI runtime…');
+
+      try {
+        await loadTransformers();
+
+        if (transcriber && typeof transcriber.dispose === 'function') {
+          try { await transcriber.dispose(); } catch (_) {}
+        }
+        transcriber = null;
+        loadedModelId = null;
+        loadedDevice = null;
+
+        setAiStatus('Preparing ' + modelId + ' (' + device.toUpperCase() + ')…', 'busy');
+        setLiveText('Fetching model: ' + modelId + '…');
+
+        let pipe;
+        const baseOpts = {
+          progress_callback: onProgress,
+          quantized: true
+        };
+
+        if (device === 'webgpu') {
+          try {
+            pipe = await pipeline('automatic-speech-recognition', modelId, {
+              progress_callback: onProgress,
+              device: 'webgpu',
+              quantized: false
+            });
+            loadedDevice = 'webgpu';
+          } catch (err) {
+            console.warn('[HEX AI] WebGPU failed, falling back to WASM:', err);
+            setAiStatus('WebGPU unavailable — falling back to WASM…', 'busy');
+            if (aiDeviceSel) aiDeviceSel.value = 'wasm';
+            pipe = await pipeline('automatic-speech-recognition', modelId, baseOpts);
+            loadedDevice = 'wasm';
+          }
+        } else {
+          pipe = await pipeline('automatic-speech-recognition', modelId, baseOpts);
+          loadedDevice = 'wasm';
+        }
+
+        transcriber = pipe;
+        loadedModelId = modelId;
+
+        setAiPercent(100);
+        setAiStatus('Model ready ✓ · ' + modelId + ' · ' + loadedDevice.toUpperCase(), 'ok');
+        setPill('Ready', 'ready');
+        setLiveText('Model loaded. Click “Generate AI Captions” to transcribe.');
+        if (aiRunBtn) aiRunBtn.disabled = false;
+
+        return transcriber;
+      } catch (err) {
+        console.error('[HEX AI] model load failed:', err);
+        setAiStatus('Failed: ' + (err && err.message ? err.message : String(err)), 'err');
+        setAiPercent(0);
+        setPill('Error', null);
+        setLiveText('Failed to load model.\n' + (err && err.message ? err.message : ''));
+        transcriber = null;
+        loadedModelId = null;
+        loadedDevice = null;
+        throw err;
+      } finally {
+        isLoadingModel = false;
+        loadPromise = null;
+        if (aiLoadBtn) aiLoadBtn.disabled = false;
+        if (aiStopBtn) aiStopBtn.disabled = true;
+      }
+    })();
+
+    return loadPromise;
+  }
+
+  /* ------------------------------------------------------------
+     Audio decoding → 16 kHz mono Float32Array
+     ------------------------------------------------------------ */
+  async function decodeToMono16k(file) {
+    const arrayBuffer = await file.arrayBuffer();
+
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) throw new Error('Web Audio API not supported.');
+
+    const tmpCtx = new AC();
+    let decoded;
+    try {
+      decoded = await new Promise((resolve, reject) => {
+        const result = tmpCtx.decodeAudioData(arrayBuffer.slice(0), resolve, reject);
+        if (result && typeof result.then === 'function') {
+          result.then(resolve, reject);
+        }
+      });
+    } finally {
+      try { tmpCtx.close(); } catch (_) {}
+    }
+
+    if (!decoded || !decoded.length) {
+      throw new Error('Could not decode audio from this file.');
+    }
+
+    const TARGET_RATE = 16000;
+    const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+    if (!OAC) throw new Error('OfflineAudioContext not supported.');
+
+    const frames = Math.max(1, Math.ceil(decoded.duration * TARGET_RATE));
+    const offCtx = new OAC(1, frames, TARGET_RATE);
+
+    const src = offCtx.createBufferSource();
+    src.buffer = decoded;
+    src.connect(offCtx.destination);
+    src.start(0);
+
+    const rendered = await offCtx.startRendering();
+    return {
+      audio: rendered.getChannelData(0),
+      duration: decoded.duration
+    };
+  }
+
+  /* ------------------------------------------------------------
+     Transcription
+     ------------------------------------------------------------ */
+  let cancelRequested = false;
+  let isTranscribing = false;
+
+  async function transcribeFile(file) {
+    if (!transcriber) throw new Error('Model not loaded.');
+
+    cancelRequested = false;
+    isTranscribing = true;
+
+    if (aiRunBtn)  aiRunBtn.disabled  = true;
+    if (aiLoadBtn) aiLoadBtn.disabled = true;
+    if (aiStopBtn) aiStopBtn.disabled = false;
+
+    showLive(true);
+    setLiveText('');
+
+    try {
+      /* 1) Decode */
+      setAiIndeterminate();
+      setAiStatus('Decoding audio from “' + file.name + '”…', 'busy');
+      setLiveText('Decoding audio…');
+
+      const { audio, duration } = await decodeToMono16k(file);
+
+      if (cancelRequested) throw new Error('cancelled');
+
+      setAiPercent(0);
+      setAiStatus(
+        'Transcribing ' + (duration ? duration.toFixed(1) + ' s' : 'audio') +
+        ' with Whisper…',
+        'busy'
+      );
+      setLiveText('Running Whisper inference…\n');
+
+      /* 2) Options */
+      const modelId = loadedModelId || (aiModelSel ? aiModelSel.value : '');
+      const isEnglishOnly = /\.en$/.test(modelId);
+
+      const opts = {
+        chunk_length_s: 30,
+        stride_length_s: 5,
+        return_timestamps: true,
+        callback_function: (beams) => {
+          try {
+            if (cancelRequested) return;
+            if (!beams || !beams.length) return;
+            const ids = beams[0].output_token_ids;
+            if (!ids) return;
+            const txt = transcriber.tokenizer.decode(ids, { skip_special_tokens: true });
+            if (txt) {
+              setLiveText(txt);
+            }
+          } catch (_) { /* best-effort streaming */ }
+        }
+      };
+
+      if (!isEnglishOnly) {
+        const lang = HEX.getTargetLanguage ? HEX.getTargetLanguage() : 'en';
+        opts.language = lang;
+        opts.task = 'transcribe';
+      }
+
+      /* 3) Run */
+      const t0 = performance.now();
+      const output = await transcriber(audio, opts);
+      const dt = ((performance.now() - t0) / 1000).toFixed(1);
+
+      if (cancelRequested) throw new Error('cancelled');
+
+      /* 4) Build segments from chunks */
+      const chunks = (output && output.chunks) ? output.chunks : [];
+      const segs = [];
+
+      for (let i = 0; i < chunks.length; i++) {
+        const c = chunks[i];
+        const text = String(c.text || '').replace(/\s+/g, ' ').trim();
+        if (!text) continue;
+
+        const t = c.timestamp || [];
+        let start = Number.isFinite(t[0]) ? t[0] : (segs.length ? segs[segs.length - 1].end : 0);
+        let end   = Number.isFinite(t[1]) ? t[1] : start + Math.max(1, text.length / 14);
+
+        if (end <= start) end = start + 0.8;
+
+        segs.push({ start: start, end: end, text: text });
+      }
+
+      /* Fallback: no chunk timestamps at all */
+      if (!segs.length && output && output.text) {
+        const full = String(output.text).replace(/\s+/g, ' ').trim();
+        if (full) {
+          /* Split into sentence-ish pieces and spread across duration */
+          const pieces = full.split(/(?<=[.!?])\s+/).filter(Boolean);
+          const total = duration || pieces.length * 2.5;
+          let cursor = 0;
+          for (let i = 0; i < pieces.length; i++) {
+            const piece = pieces[i].trim();
+            if (!piece) continue;
+            const share = (piece.length / full.length) * total;
+            const start = cursor;
+            const end = Math.min(total, cursor + Math.max(0.8, share));
+            segs.push({ start: start, end: end, text: piece });
+            cursor = end;
+          }
+        }
+      }
+
+      /* 5) Push to transcript */
+      const added = HEX.pushSegments(segs, 'ai');
+
+      setAiPercent(100);
+      setAiStatus(
+        'Done ✓ ' + added + ' cue' + (added === 1 ? '' : 's') +
+        ' in ' + dt + ' s',
+        'ok'
+      );
+      setLiveText(
+        (output && output.text ? String(output.text).trim() : '') ||
+        '(no speech detected)'
+      );
+    } finally {
+      isTranscribing = false;
+      if (aiRunBtn)  aiRunBtn.disabled  = !transcriber;
+      if (aiLoadBtn) aiLoadBtn.disabled = false;
+      if (aiStopBtn) aiStopBtn.disabled = true;
+    }
+  }
+
+  /* ------------------------------------------------------------
+     Button wiring — "Direct Generate AI Captions"
+     ------------------------------------------------------------ */
+  if (aiLoadBtn) {
+    aiLoadBtn.addEventListener('click', async function () {
+      try { await loadModel(true); }
+      catch (_) { /* status already shown */ }
+    });
+  }
+
+  if (aiRunBtn) {
+    aiRunBtn.addEventListener('click', async function () {
+      const file = HEX.getMediaFile ? HEX.getMediaFile() : null;
+
+      if (!file) {
+        setAiStatus('Load a media file first (section below).', 'err');
+        setLiveText('No media file selected.');
+        showLive(true);
+        return;
+      }
+
+      try {
+        /* Auto-load model if missing OR if the selection changed */
+        const needLoad =
+          !transcriber ||
+          !loadedModelId ||
+          loadedModelId !== (aiModelSel ? aiModelSel.value : loadedModelId) ||
+          loadedDevice !== (aiDeviceSel ? aiDeviceSel.value : loadedDevice);
+
+        if (needLoad) {
+          await loadModel(true);
+        }
+
+        await transcribeFile(file);
+      } catch (err) {
+        if (err && err.message === 'cancelled') {
+          setAiStatus('Cancelled.', 'err');
+          setLiveText('Cancelled.');
+        } else {
+          console.error('[HEX AI] transcription failed:', err);
+          setAiStatus('Transcription failed: ' + (err && err.message ? err.message : String(err)), 'err');
+          setLiveText('Error:\n' + (err && err.message ? err.message : String(err)));
+        }
+      }
+    });
+  }
+
+  if (aiStopBtn) {
+    aiStopBtn.addEventListener('click', function () {
+      cancelRequested = true;
+      setAiStatus('Cancelling…', 'busy');
+    });
+  }
+
+  /* Mark model stale when selection changes */
+  if (aiModelSel) {
+    aiModelSel.addEventListener('change', function () {
+      if (loadedModelId && loadedModelId !== aiModelSel.value) {
+        setPill('Stale', null);
+        setAiStatus('Model changed — will re-download on next Generate.', 'busy');
+      }
+    });
+  }
+  if (aiDeviceSel) {
+    aiDeviceSel.addEventListener('change', function () {
+      if (loadedDevice && loadedDevice !== aiDeviceSel.value) {
+        setPill('Stale', null);
+        setAiStatus('Device changed — will reload on next Generate.', 'busy');
+      }
+    });
+  }
+
+  /* Media file changed */
+  window.addEventListener('hex-media-change', function (ev) {
+    const file = ev && ev.detail ? ev.detail.file : null;
+    if (file) {
+      setAiStatus(
+        transcriber
+          ? 'Media ready: ' + file.name + ' — click “Generate AI Captions”.'
+          : 'Media ready: ' + file.name + ' — click “Generate AI Captions”. Model will auto-load.',
+        transcriber ? 'ok' : 'busy'
+      );
+    } else {
+      setAiStatus('Media removed.', '');
+    }
+  });
+
+  /* ------------------------------------------------------------
+     Init
+     ------------------------------------------------------------ */
+  setAiPercent(0);
+  setPill('Not loaded', null);
+  setAiStatus('Model not loaded. Click “Generate AI Captions” — the model auto-downloads.', '');
+  showLive(false);
+
+  /* Pre-warm the runtime so the first click feels instant */
+  loadTransformers()
+    .then(() => {
+      if (!transcriber) {
+        setAiStatus('Runtime ready — click “Generate AI Captions”.', '');
+      }
+    })
+    .catch((err) => {
+      console.error('[HEX AI] Transformers.js failed to load:', err);
+      setAiStatus('Could not load Transformers.js CDN. Check your connection.', 'err');
+    });
+
+})();
+</script>
+<script>
+// Disable right-click
+document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+function ctrlShiftKey(e, keyCode) {
+  return e.ctrlKey && e.shiftKey && e.keyCode === keyCode.charCodeAt(0);
+}
+
+document.onkeydown = (e) => {
+  // Disable F12, Ctrl + Shift + I, Ctrl + Shift + J, Ctrl + U
+  if (
+    event.keyCode === 123 ||
+    ctrlShiftKey(e, 'I') ||
+    ctrlShiftKey(e, 'J') ||
+    ctrlShiftKey(e, 'C') ||
+    (e.ctrlKey && e.keyCode === 'U'.charCodeAt(0))
+  )
+    return false;
+};
+</script>
+<script>
+ if (typeof document.onselectstart!="undefined" ) {
+  document.onselectstart=new Function ("return false" );
+ }
+ else {
+  document.onmousedown=new Function ("return false" );
+  document.onmouseup=new Function ("return true" );
+ }
+</script>
+<script>
+   document.onkeydown = function(e) {
+if(event.keyCode == 123) {
+    return false;
+}
+if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)){
+    return false;
+}
+if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)){
+    return false;
+}
+if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)){
+    return false;
+}
+if(e.ctrlKey && e.keyCode == 'C'.charCodeAt(0)){
+    return false;
+}
+if(e.ctrlKey && e.keyCode == 'X'.charCodeAt(0)){
+    return false;
+}
+if(e.ctrlKey && e.keyCode == 'Y'.charCodeAt(0)){
+    return false;
+}
+if(e.ctrlKey && e.keyCode == 'Z'.charCodeAt(0)){
+    return false;
+}
+if(e.ctrlKey && e.keyCode == 'V'.charCodeAt(0)){
+    return false;
+}
+if (e.keyCode == 67 && e.shiftKey && (e.ctrlKey || e.metaKey)){
+    return false;
+}
+if (e.keyCode == 'J'.charCodeAt(0) && e.altKey && (e.ctrlKey || e.metaKey)){
+    return false;
+}
+if (e.keyCode == 'I'.charCodeAt(0) && e.altKey && (e.ctrlKey || e.metaKey)){
+    return false;
+}
+if ((e.keyCode == 'V'.charCodeAt(0) && e.metaKey) || (e.metaKey && e.altKey)){
+    return false;
+}
+if (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)){
+    return false;
+}
+if(e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)){
+    return false;
+}
+if(e.ctrlKey && e.keyCode == 'H'.charCodeAt(0)){
+    return false;
+}
+if(e.ctrlKey && e.keyCode == 'A'.charCodeAt(0)){
+    return false;
+}
+if(e.ctrlKey && e.keyCode == 'F'.charCodeAt(0)){
+    return false;
+}
+if(e.ctrlKey && e.keyCode == 'E'.charCodeAt(0)){
+    return false;
+}
+}
+if (document.addEventListener) {
+    document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    }, false);
+}else{
+    document.attachEvent('oncontextmenu', function() {
+    window.event.returnValue = false;
+    });
+}
+</script>
+
+
+
+</body>
+</html>
