@@ -14,6 +14,11 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
       referrerpolicy="no-referrer" />
 
+<!-- Google Fonts for subtitle font-family options -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Bebas+Neue&family=Poppins:wght@600;800&family=Oswald:wght@600;700&family=Lobster&family=Pacifico&family=Russo+One&family=Righteous&display=swap" rel="stylesheet">
+
 <style>
   /* ═══════════════════════════════════════════════════════════
      FORCE DARK MODE — applied everywhere
@@ -323,6 +328,10 @@
     --sub-stroke:0px;
     --sub-stroke-color:#000000;
     --sub-shadow:1;
+    --sub-font:'Inter','SF Pro Display',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    --sub-letter-spacing:-0.2px;
+    --sub-line-height:1.3;
+    --sub-transform:none;
   }
 
   /* ═══════════════════════════════════════════════════════════
@@ -423,6 +432,7 @@
   }
   .card h2 i{ color:var(--p); font-size:12px; }
   .card .sub{ margin:0 0 12px; font-size:12.5px; color:var(--muted); line-height:1.55; }
+  .card .sub b{ color:var(--text); }
 
   /* Tabs */
   .tabs{
@@ -511,8 +521,11 @@
   .sub-line{
     display:inline-block; align-self:center; max-width:100%;
     padding:4px 10px; border-radius:6px;
+    font-family:var(--sub-font, inherit);
     font-size:var(--sub-size); font-weight:var(--sub-weight);
-    line-height:1.3; letter-spacing:-.2px;
+    line-height:var(--sub-line-height, 1.3);
+    letter-spacing:var(--sub-letter-spacing, -.2px);
+    text-transform:var(--sub-transform, none);
     color:var(--sub-fg); background:transparent;
     text-shadow:
       0 0 calc(var(--sub-stroke) + 1px) var(--sub-stroke-color),
@@ -533,6 +546,213 @@
     text-shadow:none; -webkit-text-stroke:0; background:transparent;
   }
 
+  /* ═══════════════════════════════════════════════════════════
+     SUBTITLE TEXT EFFECTS (applied via body[data-sub-effect="..."])
+     ═══════════════════════════════════════════════════════════ */
+
+  /* Neon glow */
+  body[data-sub-effect="neon"] .sub-line:not(.placeholder) {
+    color: #ffffff;
+    -webkit-text-stroke: 0;
+    text-shadow:
+      0 0 4px #ffffff,
+      0 0 11px var(--p),
+      0 0 19px var(--p),
+      0 0 40px var(--p),
+      0 0 80px var(--p);
+  }
+
+  /* Outline only */
+  body[data-sub-effect="outline"] .sub-line:not(.placeholder) {
+    color: transparent;
+    -webkit-text-stroke: 2px var(--sub-stroke-color);
+    text-shadow: 0 0 0 transparent;
+  }
+
+  /* Soft drop shadow */
+  body[data-sub-effect="shadow"] .sub-line:not(.placeholder) {
+    color: var(--sub-fg);
+    -webkit-text-stroke: 0;
+    text-shadow:
+      0 2px 4px rgba(0,0,0,.9),
+      0 4px 14px rgba(0,0,0,.8);
+  }
+
+  /* 3D stacked */
+  body[data-sub-effect="3d"] .sub-line:not(.placeholder) {
+    color: #ffffff;
+    -webkit-text-stroke: 0;
+    text-shadow:
+      1px 1px 0 var(--sub-stroke-color),
+      2px 2px 0 var(--sub-stroke-color),
+      3px 3px 0 var(--sub-stroke-color),
+      4px 4px 0 var(--sub-stroke-color),
+      5px 5px 0 var(--sub-stroke-color),
+      6px 6px 0 var(--sub-stroke-color),
+      7px 7px 14px rgba(0,0,0,.55);
+  }
+
+  /* Gradient */
+  body[data-sub-effect="gradient"] .sub-line:not(.placeholder) {
+    background: linear-gradient(90deg, #ff3ea5 0%, #ffb020 25%, #7cff4d 50%, #00e5ff 75%, #ff3ea5 100%);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    -webkit-text-stroke: 0;
+    text-shadow: none;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,.85));
+    animation: subGradientShift 4s linear infinite;
+  }
+  @keyframes subGradientShift {
+    0%   { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+  }
+
+  /* Chrome / metallic */
+  body[data-sub-effect="chrome"] .sub-line:not(.placeholder) {
+    background: linear-gradient(180deg,
+      #ffffff 0%, #e8e8e8 30%, #a0a0a0 48%,
+      #6a6a6a 52%, #d8d8d8 70%, #ffffff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    -webkit-text-stroke: 0;
+    text-shadow: none;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,.9));
+  }
+
+  /* Fire */
+  body[data-sub-effect="fire"] .sub-line:not(.placeholder) {
+    color: #fff8e1;
+    -webkit-text-stroke: 0;
+    text-shadow:
+      0 0 4px #fff8e1,
+      0 0 10px #ffb020,
+      0 0 18px #ff6d00,
+      0 0 32px #ff3300,
+      0 0 60px #ff1a00;
+  }
+
+  /* Ice */
+  body[data-sub-effect="ice"] .sub-line:not(.placeholder) {
+    color: #ffffff;
+    -webkit-text-stroke: 0;
+    text-shadow:
+      0 0 6px #ffffff,
+      0 0 12px #6cd8ff,
+      0 0 22px #0099ff,
+      0 0 40px #0066cc;
+  }
+
+  /* Glitch */
+  body[data-sub-effect="glitch"] .sub-line:not(.placeholder) {
+    color: #ffffff;
+    -webkit-text-stroke: 0;
+    text-shadow:
+      -2px 0 0 #ff00ff,
+       2px 0 0 #00ffff,
+       0 0 8px rgba(255,255,255,.55);
+  }
+
+  /* Retro arcade */
+  body[data-sub-effect="retro"] .sub-line:not(.placeholder) {
+    color: #ffe066;
+    -webkit-text-stroke: 0;
+    text-shadow:
+      2px 2px 0 #b45309,
+      4px 4px 0 #78350f,
+      0 0 18px #f59e0b;
+  }
+
+  /* Comic */
+  body[data-sub-effect="comic"] .sub-line:not(.placeholder) {
+    color: #ffffff;
+    -webkit-text-stroke: 3px #000000;
+    paint-order: stroke fill;
+    text-shadow:
+      4px 4px 0 #000000,
+      0 0 12px rgba(255,255,255,.25);
+  }
+
+  /* Rainbow */
+  body[data-sub-effect="rainbow"] .sub-line:not(.placeholder) {
+    background: linear-gradient(90deg,
+      #ff0000, #ff7f00, #ffff00, #00ff00,
+      #00ffff, #0000ff, #8b00ff, #ff0000);
+    background-size: 400% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    -webkit-text-stroke: 0;
+    text-shadow: none;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,.85));
+    animation: subGradientShift 5s linear infinite;
+  }
+
+  /* Gold */
+  body[data-sub-effect="gold"] .sub-line:not(.placeholder) {
+    background: linear-gradient(180deg,
+      #fff8dc 0%, #ffd700 30%, #b8860b 55%,
+      #ffd700 75%, #fff8dc 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    -webkit-text-stroke: 0;
+    text-shadow: none;
+    filter:
+      drop-shadow(0 2px 3px rgba(0,0,0,.9))
+      drop-shadow(0 0 8px rgba(255,215,0,.5));
+  }
+
+  /* Matrix */
+  body[data-sub-effect="matrix"] .sub-line:not(.placeholder) {
+    color: #00ff41;
+    -webkit-text-stroke: 0;
+    text-shadow:
+      0 0 4px #00ff41,
+      0 0 8px #00ff41,
+      0 0 16px #00cc33;
+  }
+
+  /* Horror */
+  body[data-sub-effect="horror"] .sub-line:not(.placeholder) {
+    color: #ff1744;
+    -webkit-text-stroke: 0;
+    text-shadow:
+      0 0 6px #ff1744,
+      0 0 14px #b71c1c,
+      2px 2px 0 #000000,
+      0 0 30px #ff1744;
+  }
+
+  /* Fire (blaze variant) — alias for backward compatibility */
+  body[data-sub-effect="blaze"] .sub-line:not(.placeholder) {
+    color: #fff8e1;
+    -webkit-text-stroke: 0;
+    text-shadow:
+      0 0 4px #fff8e1,
+      0 0 10px #ffb020,
+      0 0 18px #ff6d00,
+      0 0 32px #ff3300;
+  }
+
+  /* Gold (shimmer variant) — alias */
+  body[data-sub-effect="shimmer"] .sub-line:not(.placeholder) {
+    background: linear-gradient(180deg, #fff8dc, #ffd700, #b8860b, #ffd700, #fff8dc);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    -webkit-text-stroke: 0;
+    text-shadow: none;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,.9));
+  }
+
   /* Forms */
   .grid{ display:grid; grid-template-columns:1fr; gap:11px; }
   @media (min-width:560px){ .grid.two{ grid-template-columns:1fr 1fr; } }
@@ -540,7 +760,9 @@
   .field > label{
     font-size:11px; font-weight:700; letter-spacing:.5px;
     text-transform:uppercase; color:var(--muted);
+    display:flex; align-items:center; gap:6px;
   }
+  .field > label i{ color:var(--p); font-size:11px; }
   select, input[type="text"]{
     width:100%;
     background:color-mix(in srgb, var(--bc) 6%, var(--panel));
@@ -632,6 +854,8 @@
   .actions{ display:grid; grid-template-columns:1fr; gap:9px; margin-top:12px; }
   @media (min-width:420px){ .actions.two{ grid-template-columns:1fr 1fr; } }
   .actions .btn{ width:100%; }
+  .actions.three{ grid-template-columns:1fr; }
+  @media (min-width:480px){ .actions.three{ grid-template-columns:1fr 1fr 1fr; } }
 
   /* Status */
   .status{
@@ -684,27 +908,6 @@
   }
   .prog-meta b{ color:var(--text); font-weight:700; }
 
-  /* Mic card */
-  #micCard{ border-color:color-mix(in srgb, var(--p) 35%, transparent); transition:border-color .25s, background .25s; }
-  #micCard.active{ border-color:color-mix(in srgb, var(--a) 55%, transparent); background:linear-gradient(180deg, color-mix(in srgb, var(--a) 6%, var(--panel)), var(--panel)); }
-  #micCard.blocked{ border-color:rgba(255,77,109,.55); background:linear-gradient(180deg, rgba(255,77,109,.06), var(--panel)); }
-  .mic-actions{ display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-top:12px; }
-  @media (max-width:400px){ .mic-actions{ grid-template-columns:1fr; } }
-
-  .meter{ margin-top:12px; display:none; }
-  .meter.show{ display:block; }
-  .meter-bar{ height:10px; background:color-mix(in srgb, var(--bc) 8%, var(--panel)); border:1px solid var(--border); border-radius:999px; overflow:hidden; }
-  .meter-fill{ height:100%; width:0%; background:linear-gradient(90deg, var(--a), var(--p) 55%, var(--s)); transition:width .07s linear; }
-  .meter-meta{
-    display:flex; justify-content:space-between; gap:10px;
-    margin-top:7px; font-size:11px; color:var(--muted);
-    font-family:'SF Mono',ui-monospace,monospace;
-  }
-  .meter-meta b{ color:var(--a); font-weight:800; }
-  .meter-hint{ margin-top:6px; font-size:11px; color:var(--muted-2); text-align:center; letter-spacing:.3px; }
-  .meter-hint.ok{ color:var(--a); }
-  .meter-hint.warn{ color:#ffb020; }
-
   /* Env warning */
   .env-warn{
     display:none; margin-bottom:12px; padding:14px 16px; border-radius:14px;
@@ -720,10 +923,9 @@
     font-size:12px; color:#ffd8a8;
     font-family:'SF Mono',ui-monospace,monospace;
   }
-  .env-warn .env-actions{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
 
   /* ═══════════════════════════════════════════════════════════
-     THEME MODAL (new)
+     THEME MODAL
      ═══════════════════════════════════════════════════════════ */
   .theme-modal{
     position:fixed; inset:0; z-index:400;
@@ -759,10 +961,8 @@
     to{ opacity:1; transform:translateY(0) scale(1); }
   }
 
-  /* theme-card inside modal has no outer margin */
   .theme-modal-panel .card{ margin:0; }
 
-  /* Close button in theme card header */
   .theme-close-btn{
     width:36px; height:36px; flex:0 0 36px; border-radius:10px;
     display:grid; place-items:center;
@@ -778,7 +978,7 @@
   .theme-close-btn:active{ transform:rotate(90deg) scale(.92); }
 
   /* ═══════════════════════════════════════════════════════════
-     THEME PICKER UI (unchanged)
+     THEME PICKER UI
      ═══════════════════════════════════════════════════════════ */
   .theme-gallery{
     display:grid;
@@ -889,6 +1089,125 @@
   }
   .color-hex:focus{ color:var(--p); }
 
+  /* ═══════════════════════════════════════════════════════════
+     EFFECT GRID
+     ═══════════════════════════════════════════════════════════ */
+  .effect-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(88px, 1fr));
+    gap:7px;
+    padding:2px 0;
+  }
+  .effect-chip{
+    position:relative;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:5px;
+    padding:10px 6px 8px;
+    border-radius:10px;
+    background:color-mix(in srgb, var(--bc) 6%, var(--panel));
+    border:1px solid var(--border);
+    cursor:pointer;
+    transition:border-color .15s, background .15s, transform .1s, box-shadow .15s;
+    min-height:64px;
+  }
+  .effect-chip:hover{ border-color:var(--p); }
+  .effect-chip:active{ transform:scale(.95); }
+  .effect-chip.active{
+    border-color:var(--p);
+    background:color-mix(in srgb, var(--p) 12%, var(--panel));
+    box-shadow:0 0 0 2px color-mix(in srgb, var(--p) 25%, transparent);
+  }
+  .effect-chip .ec-preview{
+    display:block;
+    font-family:'Inter','SF Pro Display',sans-serif;
+    font-size:17px;
+    font-weight:900;
+    letter-spacing:-.6px;
+    line-height:1;
+    color:var(--text);
+    transition:color .15s;
+  }
+  .effect-chip .ec-name{
+    font-size:9px;
+    font-weight:800;
+    letter-spacing:.5px;
+    text-transform:uppercase;
+    color:var(--muted);
+    font-family:'SF Mono',ui-monospace,monospace;
+    transition:color .15s;
+  }
+  .effect-chip.active .ec-name{ color:var(--p); }
+
+  /* Per-effect chip previews */
+  .effect-chip[data-effect="none"] .ec-preview{ color:var(--text); }
+  .effect-chip[data-effect="neon"] .ec-preview{
+    color:#fff;
+    text-shadow: 0 0 4px var(--p), 0 0 8px var(--p);
+  }
+  .effect-chip[data-effect="outline"] .ec-preview{
+    color:transparent;
+    -webkit-text-stroke: 1.4px var(--p);
+  }
+  .effect-chip[data-effect="shadow"] .ec-preview{
+    color:#fff;
+    text-shadow: 2px 2px 3px rgba(0,0,0,.95), 0 0 6px rgba(0,0,0,.7);
+  }
+  .effect-chip[data-effect="3d"] .ec-preview{
+    color:#fff;
+    text-shadow:
+      1px 1px 0 #000, 2px 2px 0 #000,
+      3px 3px 0 #000, 4px 4px 0 #000;
+  }
+  .effect-chip[data-effect="gradient"] .ec-preview{
+    background: linear-gradient(90deg, #ff3ea5, #ffb020, #7cff4d, #00e5ff);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+  }
+  .effect-chip[data-effect="chrome"] .ec-preview{
+    background: linear-gradient(180deg, #fff, #a0a0a0, #6a6a6a, #d8d8d8, #fff);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+  }
+  .effect-chip[data-effect="fire"] .ec-preview{
+    color:#fff;
+    text-shadow: 0 0 3px #fff, 0 0 6px #ffb020, 0 0 11px #ff3300;
+  }
+  .effect-chip[data-effect="ice"] .ec-preview{
+    color:#fff;
+    text-shadow: 0 0 3px #fff, 0 0 8px #0099ff, 0 0 14px #0066cc;
+  }
+  .effect-chip[data-effect="glitch"] .ec-preview{
+    color:#fff;
+    text-shadow: -1.5px 0 #ff00ff, 1.5px 0 #00ffff;
+  }
+  .effect-chip[data-effect="retro"] .ec-preview{
+    color:#ffe066;
+    text-shadow: 1px 1px 0 #b45309, 2px 2px 0 #78350f;
+  }
+  .effect-chip[data-effect="comic"] .ec-preview{
+    color:#fff;
+    -webkit-text-stroke: 1.4px #000;
+    text-shadow: 1.5px 1.5px 0 #000;
+  }
+  .effect-chip[data-effect="rainbow"] .ec-preview{
+    background: linear-gradient(90deg, #f00, #ff7f00, #ff0, #0f0, #00ffff, #00f, #8b00ff);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+  }
+  .effect-chip[data-effect="gold"] .ec-preview{
+    background: linear-gradient(180deg, #fff8dc, #ffd700, #b8860b, #ffd700);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+  }
+  .effect-chip[data-effect="matrix"] .ec-preview{
+    color:#00ff41;
+    text-shadow: 0 0 4px #00ff41;
+  }
+  .effect-chip[data-effect="horror"] .ec-preview{
+    color:#ff1744;
+    text-shadow: 0 0 5px #ff1744, 1px 1px 0 #000;
+  }
+
   /* Sliders */
   .slider-field{
     background:color-mix(in srgb, var(--bc) 6%, var(--panel));
@@ -940,6 +1259,26 @@
     min-height:40px;
   }
   .pos-btn.active{
+    background:var(--p); color:var(--pc);
+  }
+
+  /* Transform buttons */
+  .transform-buttons{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:6px;
+    background:color-mix(in srgb, var(--bc) 6%, var(--panel));
+    border:1px solid var(--border);
+    border-radius:11px; padding:5px;
+  }
+  .transform-btn{
+    padding:10px 4px; border-radius:8px;
+    font-size:14px; font-weight:800; color:var(--muted); text-align:center;
+    transition:background .15s, color .15s;
+    display:flex; align-items:center; justify-content:center;
+    min-height:40px;
+    letter-spacing:-.3px;
+    font-family:'SF Mono',ui-monospace,monospace;
+  }
+  .transform-btn.active{
     background:var(--p); color:var(--pc);
   }
 
@@ -1021,6 +1360,38 @@
     border-color:rgba(255,176,32,.25);
   }
 
+  /* Model info chips */
+  .model-meta{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    margin-top:10px;
+  }
+  @media (max-width:520px){ .model-meta{ grid-template-columns:1fr; } }
+  .model-chip{
+    display:flex; flex-direction:column; gap:3px;
+    padding:10px 11px; border-radius:10px;
+    background:color-mix(in srgb, var(--bc) 6%, var(--panel));
+    border:1px solid var(--border);
+    cursor:pointer;
+    transition:border-color .15s, background .15s, transform .1s;
+  }
+  .model-chip:hover{ border-color:var(--p); }
+  .model-chip:active{ transform:scale(.98); }
+  .model-chip.selected{
+    border-color:var(--p);
+    background:color-mix(in srgb, var(--p) 10%, var(--panel));
+  }
+  .model-chip .mc-title{
+    font-size:12.5px; font-weight:800; color:var(--text);
+    display:flex; align-items:center; gap:6px;
+  }
+  .model-chip .mc-title i{ color:var(--p); font-size:12px; }
+  .model-chip .mc-meta{
+    font-size:10.5px; color:var(--muted);
+    font-family:'SF Mono',ui-monospace,monospace; letter-spacing:.2px;
+  }
+
   /* Dock */
   .dock{
     position:fixed; left:0; right:0; bottom:0; z-index:50;
@@ -1048,10 +1419,11 @@
     .card{ padding:13px; }
     .seg{ grid-template-columns:56px 1fr; gap:8px; font-size:13.5px; }
     .tab{ font-size:12px; padding:10px 6px; }
+    .effect-grid{ grid-template-columns:repeat(auto-fill, minmax(78px, 1fr)); }
   }
 </style>
 </head>
-<body data-mode="live">
+<body data-mode="live" data-sub-effect="none">
 
 <header class="app" style="padding-bottom:0">
   <div class="head">
@@ -1129,24 +1501,6 @@
 
 <main class="app">
 
-  <!-- ENV WARNINGS -->
-  <div id="envWarn" class="env-warn">
-    <b>⚠️ Microphone needs a secure connection.</b>
-    <div style="margin-top:6px">
-      You're viewing this page over <code id="envProtocol">file://</code>. Browsers only
-      allow microphone access on <code>https://</code> or <code>http://localhost</code>.
-    </div>
-    <div style="margin-top:6px">
-      <b>Fix:</b> upload to GitHub Pages, Netlify, Vercel. Or run:
-      <code>python -m http.server</code> → open <code>http://localhost:8000</code>.
-    </div>
-    <div class="env-actions">
-      <button id="copyLocalCmd" class="btn ghost" type="button" style="min-height:38px;font-size:12px;padding:8px 12px">
-        <i class="fa-solid fa-copy"></i> Copy local server command
-      </button>
-    </div>
-  </div>
-
   <div id="supportWarn" class="env-warn">
     <b>⚠️ Your browser doesn't fully support this app.</b>
     <div style="margin-top:6px">
@@ -1154,55 +1508,6 @@
       AI captions need <b>WebAssembly</b> and <b>Web Audio</b>.
     </div>
   </div>
-
-  <!-- ═══════════ MICROPHONE ═══════════ -->
-  <section class="card" id="micCard">
-    <div class="card-h">
-      <h2>
-        <i class="fa-solid fa-microphone"></i>
-        Microphone
-      </h2>
-      <div id="micStatus" class="status"><span class="dot"></span><span id="micStatusText">Checking…</span></div>
-    </div>
-    <p class="sub">
-      Tap <b>Allow microphone</b> to grant permission. Your browser will show a native prompt —
-      <b>we never see or store your audio</b>.
-    </p>
-
-    <div class="mic-actions">
-      <button id="requestMic" class="btn primary" type="button">
-        <i class="fa-solid fa-microphone"></i>
-        <span id="requestMicLabel">Allow microphone</span>
-      </button>
-      <button id="openSettings" class="btn ghost" type="button">
-        <i class="fa-solid fa-circle-question"></i> How to fix blocked mic
-      </button>
-    </div>
-
-    <div class="meter" id="micMeter">
-      <div class="meter-bar"><div class="meter-fill" id="micMeterFill"></div></div>
-      <div class="meter-meta">
-        <span>Input level</span>
-        <b id="micMeterPct">0%</b>
-      </div>
-      <div class="meter-hint" id="micMeterHint">Speak to test — the bar should move.</div>
-    </div>
-
-    <div class="info-box" id="micHelpBox" style="display:none">
-      <b>🔒 If the browser blocks the microphone:</b>
-      <ol style="margin:8px 0 0 18px;padding:0;font-size:12px;line-height:1.7">
-        <li>Click the <b>lock icon</b> in the address bar</li>
-        <li>Set <b>Microphone</b> to <b>Allow</b></li>
-        <li>Reload and tap <b>Allow microphone</b> again</li>
-      </ol>
-      <div style="margin-top:8px;font-size:11.5px">
-        <b>iOS Safari:</b> Settings → Safari → Microphone → Allow · <b>Android:</b> Site settings → Microphone
-      </div>
-      <button id="retryMic" class="btn ghost" type="button" style="margin-top:10px;min-height:38px;font-size:12px;padding:8px 12px">
-        <i class="fa-solid fa-rotate-right"></i> Retry now
-      </button>
-    </div>
-  </section>
 
   <!-- ═══════════ STAGE ═══════════ -->
   <section class="card" style="padding-bottom:13px">
@@ -1248,7 +1553,7 @@
         </h2>
         <div id="liveStatus" class="status"><span class="dot"></span><span id="liveStatusText">Idle</span></div>
       </div>
-      <p class="sub">Real-time captions from your mic via the browser's Web Speech API.</p>
+      <p class="sub">Real-time captions from your mic via the browser's Web Speech API. Your browser will prompt for microphone permission when you tap Start.</p>
 
       <label class="field">
         <label for="liveLang">Recognition language</label>
@@ -1293,34 +1598,63 @@
         </h2>
         <div id="aiStatus" class="status"><span class="dot"></span><span id="aiStatusText">Ready</span></div>
       </div>
+
       <p class="sub">
-        A real Whisper model runs <b style="color:var(--s)">entirely in your browser</b>.
-        Downloads once, then cached. No API key, no server.
+        Turns audio or video into timestamped <b>SRT</b> and <b>WebVTT</b> files without uploading anything.
+        Built on <b>Hugging Face Transformers.js</b> — the open-source library that runs state-of-the-art
+        machine learning directly in your browser — and <b>OpenAI Whisper</b>, the most widely used
+        open-source speech recognition model. Drop in an MP3, WAV, M4A, MP4, WebM or MOV file and the
+        tool decodes the audio track, runs Whisper locally with segment-level timestamps, and produces
+        ready-to-use subtitles you can preview, copy, or download.
       </p>
 
-      <div class="grid">
-        <label class="field">
-          <label for="aiModel">AI model</label>
-          <select id="aiModel">
-            <option value="Xenova/whisper-tiny.en" selected>Whisper Tiny · English · ~40 MB</option>
-            <option value="Xenova/whisper-base.en">Whisper Base · English · ~75 MB</option>
-            <option value="Xenova/whisper-tiny">Whisper Tiny · multilingual · ~40 MB</option>
-            <option value="Xenova/whisper-base">Whisper Base · multilingual · ~75 MB</option>
-          </select>
-        </label>
+      <p class="sub">
+        Because the model runs on your own device via <b>WebAssembly</b>, your media is never uploaded,
+        logged, or stored — safe for unpublished videos and confidential recordings. The model downloads
+        once on first use and is cached by your browser.
+      </p>
 
-        <label class="file-drop" id="aiDrop">
-          <div class="fd-icon">
-            <i class="fa-solid fa-file-arrow-up"></i>
+      <div class="field" style="margin-bottom:11px">
+        <label>Whisper model</label>
+        <div class="model-meta" id="modelMeta">
+          <div class="model-chip" data-model="onnx-community/whisper-tiny.en">
+            <div class="mc-title"><i class="fa-solid fa-bolt"></i> Whisper Tiny</div>
+            <div class="mc-meta">~45 MB · Fastest, works on any device</div>
           </div>
-          <div class="fd-body">
-            <div class="fd-title" id="aiFileName">Choose audio or video</div>
-            <div class="fd-sub" id="aiFileSub">Tap to browse any media file</div>
+          <div class="model-chip" data-model="onnx-community/whisper-base.en">
+            <div class="mc-title"><i class="fa-solid fa-scale-balanced"></i> Whisper Base</div>
+            <div class="mc-meta">~80 MB · Good balance of speed and accuracy</div>
           </div>
-          <input type="file" id="aiFile"
-            accept="audio/*,video/*,.mp3,.wav,.ogg,.oga,.opus,.m4a,.aac,.flac,.weba,.webm,.mp4,.m4v,.mov,.3gp,.3g2,.aif,.aiff,.aifc,.caf,.amr,.wma,.mkv,.avi,.ts,.mts,.m2ts,.wmv,.flv,.mpg,.mpeg" />
-        </label>
+          <div class="model-chip" data-model="onnx-community/whisper-small.en">
+            <div class="mc-title"><i class="fa-solid fa-gem"></i> Whisper Small</div>
+            <div class="mc-meta">~250 MB · Best accuracy, needs more RAM</div>
+          </div>
+        </div>
       </div>
+
+      <label class="field" style="margin-bottom:11px">
+        <label for="aiModel">Model variant (incl. multilingual)</label>
+        <select id="aiModel">
+          <option value="onnx-community/whisper-tiny.en" selected>Whisper Tiny · English · ~45 MB</option>
+          <option value="onnx-community/whisper-base.en">Whisper Base · English · ~80 MB</option>
+          <option value="onnx-community/whisper-small.en">Whisper Small · English · ~250 MB</option>
+          <option value="onnx-community/whisper-tiny">Whisper Tiny · multilingual · ~45 MB</option>
+          <option value="onnx-community/whisper-base">Whisper Base · multilingual · ~80 MB</option>
+          <option value="onnx-community/whisper-small">Whisper Small · multilingual · ~250 MB</option>
+        </select>
+      </label>
+
+      <label class="file-drop" id="aiDrop">
+        <div class="fd-icon">
+          <i class="fa-solid fa-file-arrow-up"></i>
+        </div>
+        <div class="fd-body">
+          <div class="fd-title" id="aiFileName">Choose audio or video</div>
+          <div class="fd-sub" id="aiFileSub">Tap to browse any media file</div>
+        </div>
+        <input type="file" id="aiFile"
+          accept="audio/*,video/*,.mp3,.wav,.ogg,.oga,.opus,.m4a,.aac,.flac,.weba,.webm,.mp4,.m4v,.mov,.3gp,.3g2,.aif,.aiff,.aifc,.caf,.amr,.wma,.mkv,.avi,.ts,.mts,.m2ts,.wmv,.flv,.mpg,.mpeg" />
+      </label>
 
       <div class="actions two">
         <button id="aiRun" class="btn ai" type="button" disabled>
@@ -1348,10 +1682,16 @@
         <b>Supported formats:</b>
         <div class="fmt-list" id="fmtList"></div>
       </div>
+
+      <div class="info-box">
+        <b>Speed tips:</b> Processing time depends on media duration, the selected model,
+        available CPU and memory, your browser, and whether the model is already cached.
+        Short clips work best. <b>Whisper Small</b> needs the most memory.
+      </div>
     </div>
   </section>
 
-  <!-- ═══════════ SUBTITLE STYLE ═══════════ -->
+  <!-- ═══════════ SUBTITLE STYLE (with Multi-Font Styles & Effects) ═══════════ -->
   <section class="card" id="colorsCard">
     <div class="card-h">
       <h2>
@@ -1363,9 +1703,11 @@
       </div>
     </div>
     <p class="sub">
-      Customize how your subtitles look. Changes apply instantly and are embedded into exported VTT files.
+      Customize how your subtitles look. Mix font family, text effects, colors, spacing, and position.
+      Changes apply instantly and are embedded into exported VTT files.
     </p>
 
+    <!-- Colors -->
     <div class="colors-grid">
       <div class="color-field">
         <div class="color-preview">
@@ -1412,6 +1754,52 @@
       </div>
     </div>
 
+    <!-- NEW: Font family -->
+    <div class="field" style="margin-top:14px">
+      <label for="fontFamily"><i class="fa-solid fa-font"></i> Font family</label>
+      <select id="fontFamily">
+        <option value="'Inter','SF Pro Display',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">Inter · Modern sans (Default)</option>
+        <option value="'Impact','Arial Black',sans-serif">Impact · Bold condensed</option>
+        <option value="'Arial Black','Arial Bold',sans-serif">Arial Black · Heavy</option>
+        <option value="'Georgia','Times New Roman',serif">Georgia · Classic serif</option>
+        <option value="'Playfair Display','Georgia',serif">Playfair Display · Elegant serif</option>
+        <option value="'Bebas Neue','Impact',sans-serif">Bebas Neue · Tall caps</option>
+        <option value="'Oswald','Arial Narrow',sans-serif">Oswald · Condensed</option>
+        <option value="'Poppins',system-ui,sans-serif">Poppins · Geometric sans</option>
+        <option value="'Russo One','Arial Black',sans-serif">Russo One · Tech display</option>
+        <option value="'Righteous',cursive">Righteous · Retro display</option>
+        <option value="'Lobster',cursive">Lobster · Script</option>
+        <option value="'Pacifico',cursive">Pacifico · Handwritten</option>
+        <option value="'Courier New',monospace">Courier New · Monospace</option>
+        <option value="'Comic Sans MS','Comic Sans',cursive">Comic Sans · Playful</option>
+        <option value="'Trebuchet MS',sans-serif">Trebuchet MS · Friendly sans</option>
+        <option value="'Verdana',sans-serif">Verdana · Readable sans</option>
+        <option value="'Times New Roman','Times',serif">Times New Roman · Classic</option>
+      </select>
+    </div>
+
+    <!-- NEW: Text effects grid -->
+    <div style="margin-top:14px">
+      <label style="display:block;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">
+        <i class="fa-solid fa-wand-sparkles" style="color:var(--p);margin-right:4px"></i> Text effect
+      </label>
+      <div class="effect-grid" id="effectGrid" role="radiogroup" aria-label="Text effect"></div>
+    </div>
+
+    <!-- NEW: Text transform -->
+    <div style="margin-top:14px">
+      <label style="display:block;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">
+        <i class="fa-solid fa-a" style="color:var(--p);margin-right:4px"></i> Text transform
+      </label>
+      <div class="transform-buttons">
+        <button class="transform-btn active" data-transform="none" type="button" title="Keep as-is">Aa</button>
+        <button class="transform-btn" data-transform="uppercase" type="button" title="UPPERCASE">AA</button>
+        <button class="transform-btn" data-transform="lowercase" type="button" title="lowercase">aa</button>
+        <button class="transform-btn" data-transform="capitalize" type="button" title="Capitalize Each Word">Ab</button>
+      </div>
+    </div>
+
+    <!-- Sliders (existing + new spacing/height) -->
     <div class="grid two" style="margin-top:12px">
       <div class="slider-field">
         <label>Font size <b id="sizeVal">26px</b></label>
@@ -1429,8 +1817,17 @@
         <label>Background opacity <b id="bgOpacityVal">75%</b></label>
         <input type="range" id="bgOpacityRange" min="0" max="100" value="75" step="5" />
       </div>
+      <div class="slider-field">
+        <label>Letter spacing <b id="letterSpacingVal">-0.2px</b></label>
+        <input type="range" id="letterSpacingRange" min="-4" max="12" value="-0.2" step="0.1" />
+      </div>
+      <div class="slider-field">
+        <label>Line height <b id="lineHeightVal">1.30</b></label>
+        <input type="range" id="lineHeightRange" min="1" max="2.2" value="1.3" step="0.05" />
+      </div>
     </div>
 
+    <!-- Position -->
     <div style="margin-top:12px">
       <label style="display:block;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Position</label>
       <div class="pos-buttons">
@@ -1440,6 +1837,7 @@
       </div>
     </div>
 
+    <!-- Presets -->
     <div style="margin-top:14px">
       <label style="display:block;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Quick presets</label>
       <div class="preset-row" id="presetRow"></div>
@@ -1457,7 +1855,7 @@
         <b id="cueCount">0</b>&nbsp;cues
       </div>
     </div>
-    <p class="sub" style="margin-bottom:10px">Every caption is timestamped. Export as SRT or VTT.</p>
+    <p class="sub" style="margin-bottom:10px">Every caption is timestamped. Preview, copy, or export as SRT or VTT.</p>
 
     <div id="transcript" class="transcript">
       <div class="empty" id="emptyMsg">No captions yet.</div>
@@ -1468,12 +1866,25 @@
       <span>Words: <b id="wordCount">0</b></span>
       <span>Duration: <b id="duration">00:00</b></span>
     </div>
+
+    <div class="actions three" style="margin-top:10px">
+      <button id="copyTextBtn" class="btn ghost" type="button" disabled>
+        <i class="fa-solid fa-copy"></i> Copy text
+      </button>
+      <button id="copySrtBtn" class="btn ghost" type="button" disabled>
+        <i class="fa-solid fa-copy"></i> Copy SRT
+      </button>
+      <button id="copyVttBtn" class="btn ghost" type="button" disabled>
+        <i class="fa-solid fa-copy"></i> Copy VTT
+      </button>
+    </div>
   </section>
 
 </main>
 
 <footer>
-  HEX Captions · <a href="https://github.com/xenova/transformers.js" target="_blank" rel="noopener">Transformers.js</a> · 33 themes
+  HEX Captions · <a href="https://github.com/huggingface/transformers.js" target="_blank" rel="noopener">Transformers.js</a> ·
+  <a href="https://github.com/openai/whisper" target="_blank" rel="noopener">Whisper</a> · 33 themes
   <br/>No API keys · No servers · No tracking
 </footer>
 
@@ -1560,7 +1971,6 @@ const THEME_SWATCHES = {
 let currentTheme = 'synthwave';
 let customColors = {};
 
-/* ---- Apply system theme ---- */
 function applySystemTheme(theme) {
   if (!THEMES.includes(theme)) theme = 'synthwave';
   currentTheme = theme;
@@ -1580,20 +1990,17 @@ function applySystemTheme(theme) {
   const themeLabel = document.getElementById('themeLabel');
   if (themeLabel) themeLabel.textContent = theme + ' · on-device';
 
-  // Load swatch values into custom colour inputs
   const swatch = THEME_SWATCHES[theme] || THEME_SWATCHES.synthwave;
   setCustomColor('primary', swatch[0]);
   setCustomColor('secondary', swatch[1]);
   setCustomColor('accent', swatch[2]);
   setCustomColor('neutral', swatch[3]);
 
-  // Clear custom overrides when switching themes
   customColors = {};
   clearCustomOverrides();
   try { localStorage.removeItem('hex-custom-colors'); } catch {}
 }
 
-/* ---- Custom colour overrides ---- */
 function setCustomColor(key, val) {
   const input = document.querySelector(`[data-custom-color="${key}"]`);
   if (input) input.value = val;
@@ -1607,14 +2014,8 @@ function applyCustomColors() {
   const root = document.documentElement;
   const keys = ['primary','secondary','accent','neutral','base-100','base-200','base-300','base-content'];
   const mapping = {
-    'primary':'--p',
-    'secondary':'--s',
-    'accent':'--a',
-    'neutral':'--n',
-    'base-100':'--b1',
-    'base-200':'--b2',
-    'base-300':'--b3',
-    'base-content':'--bc',
+    'primary':'--p','secondary':'--s','accent':'--a','neutral':'--n',
+    'base-100':'--b1','base-200':'--b2','base-300':'--b3','base-content':'--bc',
   };
 
   customColors = {};
@@ -1653,7 +2054,6 @@ function pickContrast(hex) {
   return lum > 0.55 ? '#0a0a0a' : '#ffffff';
 }
 
-/* ---- Build theme gallery ---- */
 function buildThemeGallery() {
   const container = document.getElementById('themeGallery');
   if (!container) return;
@@ -1687,7 +2087,6 @@ function buildThemeGallery() {
   });
 }
 
-/* ---- Build custom colour inputs ---- */
 function buildCustomColorInputs() {
   const grid = document.getElementById('customColorsGrid');
   if (!grid) return;
@@ -1737,7 +2136,6 @@ function buildCustomColorInputs() {
   });
 }
 
-/* ---- Toast notifications ---- */
 function showToast(msg) {
   let t = document.getElementById('toast');
   if (!t) {
@@ -1767,7 +2165,6 @@ function showToast(msg) {
   }, 1600);
 }
 
-/* ---- Theme modal open/close ---- */
 const themeModalEl = document.getElementById('themeModal');
 let lastFocusedBeforeModal = null;
 
@@ -1777,7 +2174,6 @@ function openThemeModal() {
   themeModalEl.classList.add('open');
   themeModalEl.setAttribute('aria-hidden', 'false');
   document.body.classList.add('theme-modal-open');
-  // Focus the close button for accessibility
   setTimeout(() => {
     document.getElementById('closeThemeModal')?.focus({ preventScroll: true });
   }, 60);
@@ -1793,21 +2189,17 @@ function closeThemeModal() {
   }
 }
 
-/* ---- Initialise theme system ---- */
 function initThemeSystem() {
-  // Restore saved theme
   let savedTheme = 'synthwave';
   try {
     const s = localStorage.getItem('hex-theme');
     if (s && THEMES.includes(s)) savedTheme = s;
   } catch {}
 
-  // Build UI first so applySystemTheme can sync swatches
   buildCustomColorInputs();
   buildThemeGallery();
   applySystemTheme(savedTheme);
 
-  // Load saved custom colours
   try {
     const saved = localStorage.getItem('hex-custom-colors');
     if (saved) {
@@ -1825,33 +2217,24 @@ function initThemeSystem() {
     }
   } catch {}
 
-  // Toggle custom panel
   document.getElementById('toggleCustom')?.addEventListener('click', () => {
     const panel = document.getElementById('customPanel');
     panel.classList.toggle('show');
   });
 
-  // Apply button
   document.getElementById('applyCustom')?.addEventListener('click', () => {
     applyCustomColors();
   });
 
-  // Reset button
   document.getElementById('resetTheme')?.addEventListener('click', () => {
     applySystemTheme(currentTheme);
     showToast('Reset to ' + currentTheme);
   });
 
-  // Header theme button → open modal
   document.getElementById('openThemePicker')?.addEventListener('click', openThemeModal);
-
-  // Close button
   document.getElementById('closeThemeModal')?.addEventListener('click', closeThemeModal);
-
-  // Backdrop click
   themeModalEl?.querySelector('[data-close-theme]')?.addEventListener('click', closeThemeModal);
 
-  // Escape key
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && themeModalEl?.classList.contains('open')) {
       e.preventDefault();
@@ -1861,42 +2244,17 @@ function initThemeSystem() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   ENVIRONMENT
+   ENVIRONMENT — browser support warning only
    ═══════════════════════════════════════════════════════════ */
-const env = {
-  protocol: location.protocol,
-  isSecure: window.isSecureContext,
-  isLocalhost: /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname),
-  isFile: location.protocol === 'file:',
-  inIframe: window.self !== window.top,
-};
-const hasGetUserMedia = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
-
-let micAllowedByPolicy = true;
-try {
-  if (document.permissionsPolicy?.allowsFeature) {
-    micAllowedByPolicy = document.permissionsPolicy.allowsFeature('microphone');
-  } else if (document.featurePolicy?.allowsFeature) {
-    micAllowedByPolicy = document.featurePolicy.allowsFeature('microphone');
-  }
-} catch {}
-
 function showEnvWarnings() {
-  const envWarn = document.getElementById('envWarn');
   const supportWarn = document.getElementById('supportWarn');
-
-  if (env.isFile || (!env.isSecure && !env.isLocalhost)) {
-    envWarn?.classList.add('show');
-    const proto = document.getElementById('envProtocol');
-    if (proto) proto.textContent = env.isFile ? 'file://' : env.protocol;
-  }
-
   const SR0 = window.SpeechRecognition || window.webkitSpeechRecognition;
   const AudioCtx0 = window.AudioContext || window.webkitAudioContext;
   const hasAudio = !!AudioCtx0 && !!window.OfflineAudioContext;
 
-  if (!SR0 && !hasAudio) supportWarn?.classList.add('show');
-  else if (!SR0) {
+  if (!SR0 && !hasAudio) {
+    supportWarn?.classList.add('show');
+  } else if (!SR0) {
     supportWarn?.classList.add('show');
     supportWarn.innerHTML = `
       <b>⚠️ Live captions not supported in this browser.</b>
@@ -1907,36 +2265,7 @@ function showEnvWarnings() {
       </div>
     `;
   }
-
-  if (env.inIframe && !micAllowedByPolicy) {
-    const helpBox = document.getElementById('micHelpBox');
-    if (helpBox) {
-      helpBox.style.display = 'block';
-      helpBox.innerHTML = `
-        <b>🔒 Microphone blocked by iframe policy.</b>
-        <div style="margin-top:6px;font-size:12px">
-          This page is embedded inside another page which hasn't allowed microphone access.
-        </div>
-        <button onclick="window.open(location.href,'_blank')" class="btn ghost" type="button"
-                style="margin-top:10px;min-height:38px;font-size:12px;padding:8px 12px">
-          <i class="fa-solid fa-arrow-up-right-from-square"></i> Open in new tab
-        </button>
-      `;
-    }
-  }
 }
-
-/* Copy local server command */
-document.getElementById('copyLocalCmd')?.addEventListener('click', async () => {
-  const cmd = 'python -m http.server 8000';
-  try {
-    await navigator.clipboard.writeText(cmd);
-    const btn = document.getElementById('copyLocalCmd');
-    const old = btn.innerHTML;
-    btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
-    setTimeout(() => { btn.innerHTML = old; }, 1500);
-  } catch {}
-});
 
 /* GTranslate fallback */
 setTimeout(() => {
@@ -1968,19 +2297,6 @@ const E = {
   subInterim: $('subInterim'),
   tabs: document.querySelectorAll('.tab'),
 
-  micCard: $('micCard'),
-  micStatus: $('micStatus'),
-  micStatusText: $('micStatusText'),
-  requestMic: $('requestMic'),
-  requestMicLabel: $('requestMicLabel'),
-  openSettings: $('openSettings'),
-  retryMic: $('retryMic'),
-  micMeter: $('micMeter'),
-  micMeterFill: $('micMeterFill'),
-  micMeterPct: $('micMeterPct'),
-  micMeterHint: $('micMeterHint'),
-  micHelpBox: $('micHelpBox'),
-
   aiModel: $('aiModel'),
   aiFile: $('aiFile'),
   aiDrop: $('aiDrop'),
@@ -1997,6 +2313,7 @@ const E = {
   cacheInfo: $('cacheInfo'),
   cacheInfoText: $('cacheInfoText'),
   fmtList: $('fmtList'),
+  modelMeta: $('modelMeta'),
 
   liveLang: $('liveLang'),
   liveStatus: $('liveStatus'),
@@ -2015,6 +2332,10 @@ const E = {
   dockStartLabel: $('dockStartLabel'),
   dockStop: $('dockStop'),
 
+  copyTextBtn: $('copyTextBtn'),
+  copySrtBtn: $('copySrtBtn'),
+  copyVttBtn: $('copyVttBtn'),
+
   fgColor: $('fgColor'), fgHex: $('fgHex'), fgSwatch: $('fgSwatch'),
   bgColor: $('bgColor'), bgHex: $('bgHex'), bgSwatch: $('bgSwatch'),
   strokeColor: $('strokeColor'), strokeHex: $('strokeHex'), strokeSwatch: $('strokeSwatch'),
@@ -2023,8 +2344,12 @@ const E = {
   weightRange: $('weightRange'), weightVal: $('weightVal'),
   strokeRange: $('strokeRange'), strokeVal: $('strokeVal'),
   bgOpacityRange: $('bgOpacityRange'), bgOpacityVal: $('bgOpacityVal'),
+  letterSpacingRange: $('letterSpacingRange'), letterSpacingVal: $('letterSpacingVal'),
+  lineHeightRange: $('lineHeightRange'), lineHeightVal: $('lineHeightVal'),
+  fontFamily: $('fontFamily'),
   presetRow: $('presetRow'),
   posButtons: document.querySelectorAll('.pos-btn'),
+  effectGrid: $('effectGrid'),
 };
 
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -2044,7 +2369,7 @@ const HAS_CACHE = detectCacheStorage();
 
 if (HAS_CACHE) {
   E.cacheInfo.classList.remove('cache-off');
-  E.cacheInfoText.innerHTML = 'enabled — the model is cached after the first download.';
+  E.cacheInfoText.innerHTML = 'enabled — the model is cached after the first download, shared across sessions.';
 } else {
   E.cacheInfo.classList.add('cache-off');
   E.cacheInfoText.innerHTML = 'unavailable (needs <code>https://</code> or <code>localhost</code>). Model re-downloads each session.';
@@ -2060,19 +2385,44 @@ E.fmtList.innerHTML = FORMATS.map(f =>
   `<span class="fmt-chip${f.ok ? '' : ' maybe'}">${f.ext}</span>`
 ).join('');
 
+/* ─── Effect definitions ─── */
+const EFFECTS = [
+  { id:'none',     name:'Plain'   },
+  { id:'neon',     name:'Neon'    },
+  { id:'outline',  name:'Outline' },
+  { id:'shadow',   name:'Shadow'  },
+  { id:'3d',       name:'3D'      },
+  { id:'gradient', name:'Gradient'},
+  { id:'chrome',   name:'Chrome'  },
+  { id:'gold',     name:'Gold'    },
+  { id:'fire',     name:'Fire'    },
+  { id:'ice',      name:'Ice'     },
+  { id:'glitch',   name:'Glitch'  },
+  { id:'retro',    name:'Retro'   },
+  { id:'comic',    name:'Comic'   },
+  { id:'rainbow',  name:'Rainbow' },
+  { id:'matrix',   name:'Matrix'  },
+  { id:'horror',   name:'Horror'  },
+];
+
 /* STATE */
+const DEFAULT_STYLE = {
+  fg: '#ffffff', bg: '#000000', bgOpacity: 75,
+  stroke: '#000000', accent: '#00e5ff',
+  size: 26, weight: 800, strokeWidth: 0, position: 'bottom',
+  effect: 'none',
+  font: "'Inter','SF Pro Display',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",
+  letterSpacing: -0.2,
+  lineHeight: 1.3,
+  textTransform: 'none',
+};
+
 const S = {
   segments: [],
   liveActive: false, liveRec: null, liveRestartTimer: null,
   liveSessionStart: 0, liveOffset: 0, liveLastEnd: 0,
   aiBusy: false, aiAbort: false,
-  micStream: null, micAudioCtx: null, micAnalyser: null, micRAF: null,
-  micHolding: false, micPermission: 'unknown',
-  style: {
-    fg: '#ffffff', bg: '#000000', bgOpacity: 75,
-    stroke: '#000000', accent: '#00e5ff',
-    size: 26, weight: 800, strokeWidth: 0, position: 'bottom',
-  },
+  style: { ...DEFAULT_STYLE },
 };
 
 /* TIME HELPERS */
@@ -2101,7 +2451,6 @@ function setStatus(node, textNode, kind, text) {
 }
 const setAIStatus = (k,t) => setStatus(E.aiStatus, E.aiStatusText, k, t);
 const setLiveStatus = (k,t) => setStatus(E.liveStatus, E.liveStatusText, k, t);
-const setMicStatus = (k,t) => setStatus(E.micStatus, E.micStatusText, k, t);
 
 function setProgress(pct, text) {
   E.aiProgress.classList.add('show');
@@ -2119,6 +2468,9 @@ function refreshActions() {
   const has = S.segments.length > 0;
   E.srtBtn.disabled = !has;
   E.vttBtn.disabled = !has;
+  if (E.copyTextBtn) E.copyTextBtn.disabled = !has;
+  if (E.copySrtBtn)  E.copySrtBtn.disabled = !has;
+  if (E.copyVttBtn)  E.copyVttBtn.disabled = !has;
 
   if (document.body.dataset.mode === 'ai') {
     E.dockStartLabel.textContent = 'Generate';
@@ -2163,6 +2515,7 @@ function hexToRgba(hex, alpha) {
 function applySubtitleStyle() {
   const st = S.style;
   const root = document.documentElement;
+
   root.style.setProperty('--sub-fg', st.fg);
   root.style.setProperty('--sub-bg', hexToRgba(st.bg, st.bgOpacity/100));
   root.style.setProperty('--sub-size', st.size + 'px');
@@ -2171,9 +2524,33 @@ function applySubtitleStyle() {
   root.style.setProperty('--sub-stroke-color', st.stroke);
   root.style.setProperty('--sub-shadow', st.strokeWidth > 0 ? 1.2 : 1);
 
+  // NEW: multi-font + effects
+  if (st.font) root.style.setProperty('--sub-font', st.font);
+  if (typeof st.letterSpacing === 'number') {
+    root.style.setProperty('--sub-letter-spacing', st.letterSpacing + 'px');
+  }
+  if (typeof st.lineHeight === 'number') {
+    root.style.setProperty('--sub-line-height', String(st.lineHeight));
+  }
+  root.style.setProperty('--sub-transform', st.textTransform || 'none');
+
+  // Effect via data attribute
+  document.body.dataset.subEffect = st.effect || 'none';
+
   document.body.classList.remove('sub-pos-top', 'sub-pos-mid', 'sub-pos-bottom');
   document.body.classList.add('sub-pos-' + st.position);
   E.posButtons.forEach(b => b.classList.toggle('active', b.dataset.pos === st.position));
+
+  // Sync transform buttons
+  document.querySelectorAll('.transform-btn').forEach(b => {
+    b.classList.toggle('active', (b.dataset.transform || 'none') === (st.textTransform || 'none'));
+  });
+
+  // Sync effect chips
+  document.querySelectorAll('.effect-chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.effect === (st.effect || 'none'));
+    c.setAttribute('aria-checked', c.dataset.effect === (st.effect || 'none') ? 'true' : 'false');
+  });
 
   E.fgSwatch.style.background = st.fg;
   E.bgSwatch.style.background = st.bg;
@@ -2223,6 +2600,66 @@ E.bgOpacityRange.addEventListener('input', () => {
   E.bgOpacityVal.textContent = S.style.bgOpacity + '%';
   applySubtitleStyle(); saveSubtitleStyle();
 });
+
+/* NEW: letter-spacing / line-height */
+E.letterSpacingRange?.addEventListener('input', () => {
+  S.style.letterSpacing = parseFloat(E.letterSpacingRange.value);
+  E.letterSpacingVal.textContent = S.style.letterSpacing.toFixed(1) + 'px';
+  applySubtitleStyle(); saveSubtitleStyle();
+});
+E.lineHeightRange?.addEventListener('input', () => {
+  S.style.lineHeight = parseFloat(E.lineHeightRange.value);
+  E.lineHeightVal.textContent = S.style.lineHeight.toFixed(2);
+  applySubtitleStyle(); saveSubtitleStyle();
+});
+
+/* NEW: font family */
+E.fontFamily?.addEventListener('change', () => {
+  S.style.font = E.fontFamily.value;
+  applySubtitleStyle(); saveSubtitleStyle();
+  showToast('Font: ' + (E.fontFamily.options[E.fontFamily.selectedIndex]?.text || 'changed'));
+});
+
+/* NEW: text transform buttons */
+document.querySelectorAll('.transform-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    S.style.textTransform = btn.dataset.transform || 'none';
+    applySubtitleStyle(); saveSubtitleStyle();
+  });
+});
+
+/* NEW: build the text effect grid */
+function buildEffectGrid() {
+  const grid = E.effectGrid;
+  if (!grid) return;
+  grid.innerHTML = EFFECTS.map(e => `
+    <button class="effect-chip" data-effect="${e.id}" type="button" role="radio" aria-checked="false" title="${e.name}">
+      <span class="ec-preview">Aa</span>
+      <span class="ec-name">${e.name}</span>
+    </button>
+  `).join('');
+
+  grid.addEventListener('click', (ev) => {
+    const chip = ev.target.closest('.effect-chip');
+    if (!chip) return;
+    setEffect(chip.dataset.effect);
+  });
+}
+
+function setEffect(id) {
+  if (!EFFECTS.find(e => e.id === id)) id = 'none';
+  S.style.effect = id;
+  document.body.dataset.subEffect = id;
+  document.querySelectorAll('.effect-chip').forEach(c => {
+    const active = c.dataset.effect === id;
+    c.classList.toggle('active', active);
+    c.setAttribute('aria-checked', active ? 'true' : 'false');
+  });
+  saveSubtitleStyle();
+  const found = EFFECTS.find(e => e.id === id);
+  showToast('Effect: ' + (found ? found.name : id));
+}
+
 E.posButtons.forEach(b => {
   b.addEventListener('click', () => {
     S.style.position = b.dataset.pos;
@@ -2230,15 +2667,22 @@ E.posButtons.forEach(b => {
   });
 });
 
+/* PRESETS (now include effect) */
 const PRESETS = [
-  { name:'Classic',   fg:'#ffffff', bg:'#000000', op:75, stroke:'#000000', sw:0, size:26, weight:800 },
-  { name:'Neon Cyan', fg:'#00e5ff', bg:'#000814', op:70, stroke:'#00b3cc', sw:1, size:28, weight:800 },
-  { name:'Acid Lime', fg:'#7cff4d', bg:'#0a1408', op:65, stroke:'#0d3000', sw:1, size:26, weight:900 },
-  { name:'Hot Pink',  fg:'#ff3ea5', bg:'#1a0010', op:70, stroke:'#ff0066', sw:1, size:28, weight:800 },
-  { name:'Amber',     fg:'#ffb020', bg:'#1a1000', op:75, stroke:'#331f00', sw:0, size:26, weight:800 },
-  { name:'Pure',      fg:'#ffffff', bg:'#000000', op:0,  stroke:'#000000', sw:2, size:26, weight:900 },
-  { name:'Minimal',   fg:'#e6ecff', bg:'#000000', op:35, stroke:'#000000', sw:0, size:22, weight:600 },
-  { name:'Violet',    fg:'#c9a0ff', bg:'#0f0024', op:72, stroke:'#4b1a8a', sw:1, size:26, weight:800 },
+  { name:'Classic',     fg:'#ffffff', bg:'#000000', op:75, stroke:'#000000', sw:0, size:26, weight:800, effect:'none' },
+  { name:'Neon Cyan',   fg:'#00e5ff', bg:'#000814', op:70, stroke:'#00b3cc', sw:1, size:28, weight:800, effect:'neon' },
+  { name:'Acid Lime',   fg:'#7cff4d', bg:'#0a1408', op:65, stroke:'#0d3000', sw:1, size:26, weight:900, effect:'neon' },
+  { name:'Hot Pink',    fg:'#ff3ea5', bg:'#1a0010', op:70, stroke:'#ff0066', sw:1, size:28, weight:800, effect:'neon' },
+  { name:'Amber Flame', fg:'#ffb020', bg:'#1a1000', op:75, stroke:'#331f00', sw:0, size:28, weight:800, effect:'fire' },
+  { name:'Pure Outline',fg:'#ffffff', bg:'#000000', op:0,  stroke:'#ff3366', sw:0, size:30, weight:900, effect:'outline' },
+  { name:'Minimal',     fg:'#e6ecff', bg:'#000000', op:35, stroke:'#000000', sw:0, size:22, weight:600, effect:'shadow' },
+  { name:'Violet Neon', fg:'#c9a0ff', bg:'#0f0024', op:72, stroke:'#4b1a8a', sw:1, size:26, weight:800, effect:'neon' },
+  { name:'Retro Arcade',fg:'#ffe066', bg:'#1a0505', op:75, stroke:'#b45309', sw:0, size:28, weight:900, effect:'retro' },
+  { name:'Cyber Glitch',fg:'#ffffff', bg:'#0a0014', op:72, stroke:'#ff00ff', sw:0, size:26, weight:800, effect:'glitch' },
+  { name:'Golden',      fg:'#ffd700', bg:'#000000', op:70, stroke:'#b8860b', sw:0, size:30, weight:900, effect:'gold' },
+  { name:'Matrix',      fg:'#00ff41', bg:'#000000', op:80, stroke:'#00cc33', sw:0, size:26, weight:700, effect:'matrix' },
+  { name:'Ice Frost',   fg:'#ffffff', bg:'#001a2e', op:72, stroke:'#00aaff', sw:1, size:28, weight:800, effect:'ice' },
+  { name:'Comic Pop',   fg:'#ffffff', bg:'#000000', op:60, stroke:'#000000', sw:0, size:28, weight:900, effect:'comic' },
 ];
 
 function applyPreset(p) {
@@ -2246,6 +2690,7 @@ function applyPreset(p) {
     fg: p.fg, bg: p.bg, bgOpacity: p.op,
     stroke: p.stroke, strokeWidth: p.sw,
     size: p.size, weight: p.weight,
+    effect: p.effect || 'none',
   });
   E.fgColor.value = p.fg; E.fgHex.value = p.fg.toUpperCase();
   E.bgColor.value = p.bg; E.bgHex.value = p.bg.toUpperCase();
@@ -2269,16 +2714,26 @@ E.presetRow.addEventListener('click', (e) => {
   if (PRESETS[idx]) applyPreset(PRESETS[idx]);
 });
 
-const SUB_STYLE_KEY = 'hex-caption-style-v3';
+const SUB_STYLE_KEY = 'hex-caption-style-v4';
 function saveSubtitleStyle() {
   try { localStorage.setItem(SUB_STYLE_KEY, JSON.stringify(S.style)); } catch {}
 }
+
+/* Build effects grid now (before loading saved state, so chips exist for sync) */
+buildEffectGrid();
+
+/* Load saved style, merging with new defaults */
 try {
   const saved = localStorage.getItem(SUB_STYLE_KEY);
-  if (saved) Object.assign(S.style, JSON.parse(saved));
+  if (saved) {
+    const parsed = JSON.parse(saved);
+    Object.assign(S.style, DEFAULT_STYLE, parsed);
+  }
 } catch {}
 
+/* Apply + sync all UI controls to loaded state */
 applySubtitleStyle();
+
 E.fgColor.value = S.style.fg; E.fgHex.value = S.style.fg.toUpperCase();
 E.bgColor.value = S.style.bg; E.bgHex.value = S.style.bg.toUpperCase();
 E.strokeColor.value = S.style.stroke; E.strokeHex.value = S.style.stroke.toUpperCase();
@@ -2288,190 +2743,42 @@ E.weightRange.value = S.style.weight; E.weightVal.textContent = S.style.weight;
 E.strokeRange.value = S.style.strokeWidth; E.strokeVal.textContent = S.style.strokeWidth + 'px';
 E.bgOpacityRange.value = S.style.bgOpacity; E.bgOpacityVal.textContent = S.style.bgOpacity + '%';
 
-/* MICROPHONE */
-function stopMeter() {
-  if (S.micRAF) { cancelAnimationFrame(S.micRAF); S.micRAF = null; }
-  S.micAnalyser = null;
-  if (S.micAudioCtx) { try { S.micAudioCtx.close(); } catch {} S.micAudioCtx = null; }
-  E.micMeter.classList.remove('show');
-  E.micMeterFill.style.width = '0%';
-  E.micMeterPct.textContent = '0%';
-  E.micMeterHint.textContent = 'Speak to test — the bar should move.';
-  E.micMeterHint.classList.remove('ok', 'warn');
+if (E.letterSpacingRange) {
+  E.letterSpacingRange.value = S.style.letterSpacing;
+  E.letterSpacingVal.textContent = Number(S.style.letterSpacing).toFixed(1) + 'px';
+}
+if (E.lineHeightRange) {
+  E.lineHeightRange.value = S.style.lineHeight;
+  E.lineHeightVal.textContent = Number(S.style.lineHeight).toFixed(2);
+}
+if (E.fontFamily) {
+  // Try to select the saved font; if not present, leave default
+  const opts = Array.from(E.fontFamily.options);
+  const match = opts.find(o => o.value === S.style.font);
+  if (match) E.fontFamily.value = S.style.font;
 }
 
-function releaseMic() {
-  stopMeter();
-  if (S.micStream) {
-    try { S.micStream.getTracks().forEach(t => t.stop()); } catch {}
-    S.micStream = null;
-  }
-  S.micHolding = false;
-  E.micCard.classList.remove('active');
-  E.requestMic.className = 'btn primary';
-  E.requestMicLabel.textContent = 'Allow microphone';
+/* ═══════════════════════════════════════════════════════════
+   MODEL CHIP SELECTION (mirrors #aiModel)
+   ═══════════════════════════════════════════════════════════ */
+function syncModelChips() {
+  const current = E.aiModel.value;
+  document.querySelectorAll('.model-chip').forEach(chip => {
+    chip.classList.toggle('selected', chip.dataset.model === current);
+  });
 }
-
-function startMeter() {
-  if (!S.micStream) return;
-  try {
-    const ctx = new AudioCtx();
-    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
-    S.micAudioCtx = ctx;
-    const src = ctx.createMediaStreamSource(S.micStream);
-    const analyser = ctx.createAnalyser();
-    analyser.fftSize = 512;
-    analyser.smoothingTimeConstant = 0.75;
-    src.connect(analyser);
-    S.micAnalyser = analyser;
-
-    const data = new Uint8Array(analyser.frequencyBinCount);
-    E.micMeter.classList.add('show');
-    let peakSeen = 0;
-
-    const tick = () => {
-      if (!S.micAnalyser) return;
-      S.micAnalyser.getByteFrequencyData(data);
-      let sum = 0;
-      for (let i=0; i<data.length; i++) sum += data[i]*data[i];
-      const rms = Math.sqrt(sum / data.length);
-      const pct = Math.max(0, Math.min(100, Math.round((rms/90)*100)));
-      E.micMeterFill.style.width = pct + '%';
-      E.micMeterPct.textContent = pct + '%';
-      if (pct > peakSeen) peakSeen = pct;
-      if (peakSeen > 8) {
-        E.micMeterHint.textContent = '✓ Microphone is capturing sound';
-        E.micMeterHint.classList.add('ok');
-      }
-      S.micRAF = requestAnimationFrame(tick);
-    };
-    tick();
-  } catch (err) { console.warn('Meter failed:', err); }
-}
-
-async function tryGetUserMedia() {
-  const sets = [
-    { audio: { echoCancellation:true, noiseSuppression:true, autoGainControl:true }, video: false },
-    { audio: true, video: false },
-    { audio: { channelCount: 1 }, video: false },
-  ];
-  let lastErr = null;
-  for (const c of sets) {
-    try { return await navigator.mediaDevices.getUserMedia(c); }
-    catch (err) {
-      lastErr = err;
-      if (err.name === 'NotAllowedError' || err.name === 'SecurityError') throw err;
-    }
+E.modelMeta?.addEventListener('click', (e) => {
+  const chip = e.target.closest('.model-chip');
+  if (!chip) return;
+  const modelId = chip.dataset.model;
+  const opt = Array.from(E.aiModel.options).find(o => o.value === modelId);
+  if (opt) {
+    E.aiModel.value = modelId;
+    syncModelChips();
   }
-  throw lastErr || new Error('getUserMedia failed');
-}
-
-async function acquireMic() {
-  if (!hasGetUserMedia) {
-    setMicStatus('error', 'Not available');
-    E.micHelpBox.style.display = 'block';
-    E.micCard.classList.add('blocked');
-    return false;
-  }
-
-  setMicStatus('working', 'Requesting…');
-  E.requestMic.disabled = true;
-
-  try {
-    const stream = await tryGetUserMedia();
-    if (S.micStream) {
-      try { S.micStream.getTracks().forEach(t => t.stop()); } catch {}
-      S.micStream = null;
-    }
-    S.micStream = stream;
-    S.micHolding = true;
-    S.micPermission = 'granted';
-
-    stream.getAudioTracks().forEach(track => {
-      track.addEventListener('ended', () => {
-        releaseMic();
-        setMicStatus('denied', 'Released');
-      });
-    });
-
-    setMicStatus('granted', 'Allowed ✓');
-    E.micHelpBox.style.display = 'none';
-    E.micCard.classList.add('active');
-    E.micCard.classList.remove('blocked');
-    E.requestMic.className = 'btn live';
-    E.requestMicLabel.textContent = 'Release microphone';
-    startMeter();
-    return true;
-
-  } catch (err) {
-    const name = err?.name || 'Error';
-    S.micPermission = 'denied';
-    E.micCard.classList.add('blocked');
-    E.micCard.classList.remove('active');
-
-    let friendly = name;
-    if (name === 'NotAllowedError' || name === 'SecurityError') friendly = 'Blocked by user';
-    else if (name === 'NotFoundError' || name === 'DevicesNotFoundError') friendly = 'No microphone found';
-    else if (name === 'NotReadableError' || name === 'TrackStartError') friendly = 'Mic in use';
-    else if (name === 'OverconstrainedError') friendly = 'Constraints failed';
-    else if (name === 'AbortError') friendly = 'Aborted';
-
-    setMicStatus('denied', friendly);
-    E.micHelpBox.style.display = 'block';
-    return false;
-  } finally {
-    E.requestMic.disabled = false;
-  }
-}
-
-E.requestMic.addEventListener('click', async () => {
-  if (S.micHolding) {
-    releaseMic();
-    setMicStatus('', 'Released');
-    return;
-  }
-  await acquireMic();
 });
-
-E.openSettings.addEventListener('click', () => {
-  E.micHelpBox.style.display = 'block';
-  E.micHelpBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-});
-
-E.retryMic?.addEventListener('click', async () => {
-  E.micHelpBox.style.display = 'none';
-  await acquireMic();
-});
-
-(async () => {
-  if (!navigator.permissions?.query) {
-    setMicStatus('', 'Ready');
-    return;
-  }
-  try {
-    const status = await navigator.permissions.query({ name: 'microphone' });
-    S.micPermission = status.state;
-    if (status.state === 'granted') setMicStatus('granted', 'Allowed (idle)');
-    else if (status.state === 'denied') {
-      setMicStatus('denied', 'Blocked');
-      E.micCard.classList.add('blocked');
-      E.micHelpBox.style.display = 'block';
-    } else setMicStatus('', 'Not requested');
-
-    status.onchange = () => {
-      S.micPermission = status.state;
-      if (status.state === 'granted') {
-        setMicStatus('granted', 'Allowed');
-        E.micCard.classList.remove('blocked');
-      } else if (status.state === 'denied') {
-        setMicStatus('denied', 'Blocked');
-        E.micCard.classList.add('blocked');
-        E.micHelpBox.style.display = 'block';
-        releaseMic();
-      } else setMicStatus('', 'Not requested');
-    };
-  } catch { setMicStatus('', 'Ready'); }
-})();
+E.aiModel.addEventListener('change', syncModelChips);
+syncModelChips();
 
 /* SEGMENT STORE */
 function makeSegmentEl(seg) {
@@ -2535,26 +2842,6 @@ function addSegment(start, end, text, opts = {}) {
   refreshActions();
 }
 
-function clearAllSegments() {
-  S.segments = [];
-  E.cueList.innerHTML = '';
-  if (!E.emptyMsg) {
-    E.emptyMsg = document.createElement('div');
-    E.emptyMsg.className = 'empty';
-    E.emptyMsg.id = 'emptyMsg';
-  }
-  E.emptyMsg.textContent = 'No captions yet.';
-  E.transcript.insertBefore(E.emptyMsg, E.cueList);
-
-  E.subFinal.textContent = document.body.dataset.mode === 'ai'
-    ? 'AI captions will appear here…'
-    : 'Live captions will appear here…';
-  E.subFinal.classList.add('placeholder');
-  E.subInterim.textContent = '';
-  refreshStats();
-  refreshActions();
-}
-
 /* EXPORT */
 function buildSRT() {
   return '\uFEFF' + S.segments.map((s, i) => {
@@ -2563,6 +2850,7 @@ function buildSRT() {
     return `${i+1}\n${a} --> ${b}\n${s.text}\n`;
   }).join('\n');
 }
+
 function buildVTT() {
   const st = S.style;
   const fg = st.fg;
@@ -2571,12 +2859,22 @@ function buildVTT() {
   const sw = st.strokeWidth;
   const pos = st.position === 'top' ? '10' : st.position === 'mid' ? '50' : '90';
 
+  const fontFamily = st.font || 'inherit';
+  const letterSpacing = (typeof st.letterSpacing === 'number') ? st.letterSpacing : -0.2;
+  const lineHeight = (typeof st.lineHeight === 'number') ? st.lineHeight : 1.3;
+  const textTransform = st.textTransform || 'none';
+
+  // VTT ::cue CSS — carry through as much visual info as players support
   const styleBlock = `STYLE
 ::cue {
   color: ${fg};
   background: ${bg};
+  font-family: ${fontFamily};
   font-weight: ${st.weight};
   font-size: ${st.size}px;
+  letter-spacing: ${letterSpacing}px;
+  line-height: ${lineHeight};
+  text-transform: ${textTransform};
   -webkit-text-stroke: ${sw}px ${stroke};
   text-shadow: 0 0 ${sw+1}px ${stroke};
 }
@@ -2589,6 +2887,29 @@ function buildVTT() {
 
   return 'WEBVTT\n\n' + styleBlock + '\n' + body;
 }
+
+function buildPlainText() {
+  return S.segments.map(s => s.text).join('\n');
+}
+
+async function copyToClipboard(text, label) {
+  if (!text) return;
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast(label + ' copied');
+  } catch {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); showToast(label + ' copied'); }
+    catch { showToast('Copy failed'); }
+    ta.remove();
+  }
+}
+
 function download(name, content, mime) {
   const blob = new Blob([content], { type: (mime || 'text/plain') + ';charset=utf-8' });
   const url = URL.createObjectURL(blob);
@@ -2637,9 +2958,6 @@ function liveError(ev) {
   if (err === 'no-speech' || err === 'aborted') return;
   if (err === 'not-allowed' || err === 'service-not-allowed') {
     setLiveStatus('error', 'Mic blocked');
-    E.micHelpBox.style.display = 'block';
-    setMicStatus('denied', 'Blocked');
-    E.micCard.classList.add('blocked');
     liveStopAll();
     return;
   }
@@ -2663,7 +2981,6 @@ function liveSpinUp() {
 
   rec.onstart = () => {
     setLiveStatus('listening', 'Listening…');
-    setMicStatus('granted', 'In use');
     E.stage.classList.add('listening');
     E.phText.textContent = 'Listening… speak now';
     refreshActions();
@@ -2712,13 +3029,6 @@ async function liveStart() {
   if (!SR_OK) { setLiveStatus('error', 'Speech API unavailable'); return; }
   if (S.liveActive) return;
   setLiveStatus('working', 'Starting…');
-  if (S.micHolding) {
-    releaseMic();
-    await new Promise(r => setTimeout(r, 250));
-  } else if (S.micPermission !== 'granted') {
-    const ok = await acquireMic();
-    if (ok) { releaseMic(); await new Promise(r => setTimeout(r, 250)); }
-  }
   S.liveActive = true;
   const last = S.segments[S.segments.length - 1];
   S.liveOffset = last ? last.end + 0.25 : 0;
@@ -2734,11 +3044,12 @@ function liveStopAll() {
   E.subInterim.textContent = '';
   E.stage.classList.remove('listening');
   setLiveStatus('idle', 'Stopped');
-  if (S.micPermission === 'granted') setMicStatus('', 'Allowed (idle)');
   refreshActions();
 }
 
-/* AI */
+/* ═══════════════════════════════════════════════════════════
+   AI — @huggingface/transformers v3 + Whisper
+   ═══════════════════════════════════════════════════════════ */
 let transformersPromise = null;
 let cachedTranscriber = null;
 let cachedModelId = null;
@@ -2746,7 +3057,7 @@ let cachedModelId = null;
 async function loadTransformers() {
   if (!transformersPromise) {
     transformersPromise = (async () => {
-      const mod = await import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2');
+      const mod = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.2');
       mod.env.allowLocalModels = false;
       mod.env.useBrowserCache = HAS_CACHE;
       mod.env.useFSCache = false;
@@ -2755,6 +3066,7 @@ async function loadTransformers() {
   }
   return transformersPromise;
 }
+
 async function decodeAudioToMono16k(file) {
   const buf = await file.arrayBuffer();
   let decoded = null;
@@ -2772,6 +3084,7 @@ async function decodeAudioToMono16k(file) {
     }
   }
   try { ctx.close(); } catch {}
+
   const targetRate = 16000;
   const frames = Math.max(1, Math.ceil(decoded.duration * targetRate));
   const offline = new OfflineAudioContext(1, frames, targetRate);
@@ -2782,6 +3095,7 @@ async function decodeAudioToMono16k(file) {
   const rendered = await offline.startRendering();
   return { audio: rendered.getChannelData(0), duration: decoded.duration };
 }
+
 function aiProgressCb(data) {
   if (!data) return;
   if (data.status === 'progress' && data.total) {
@@ -2794,17 +3108,30 @@ function aiProgressCb(data) {
     setProgress(100, 'Model ready — transcribing…');
   }
 }
+
 async function getTranscriber(modelId) {
   if (cachedTranscriber && cachedModelId === modelId) return cachedTranscriber;
   const mod = await loadTransformers();
   mod.env.useBrowserCache = HAS_CACHE;
-  cachedTranscriber = await mod.pipeline('automatic-speech-recognition', modelId, {
+
+  let device = 'wasm';
+  try {
+    if (navigator.gpu && await navigator.gpu.requestAdapter()) {
+      device = 'webgpu';
+    }
+  } catch {}
+
+  const options = {
+    dtype: 'q8',
+    device,
     progress_callback: aiProgressCb,
-    quantized: true,
-  });
+  };
+
+  cachedTranscriber = await mod.pipeline('automatic-speech-recognition', modelId, options);
   cachedModelId = modelId;
   return cachedTranscriber;
 }
+
 async function runAI() {
   if (S.aiBusy) return;
   const file = E.aiFile.files?.[0];
@@ -2818,11 +3145,14 @@ async function runAI() {
     const { audio, duration } = await decodeAudioToMono16k(file);
     if (S.aiAbort) throw new Error('cancelled');
     setProgress(5, `Audio decoded (${duration.toFixed(1)}s) · loading model…`);
+
     const modelId = E.aiModel.value;
     const transcriber = await getTranscriber(modelId);
     if (S.aiAbort) throw new Error('cancelled');
+
     setProgress(100, 'Transcribing… this may take a moment');
     setAIStatus('working', 'Transcribing…');
+
     const isEnglishOnly = /\.en$/.test(modelId);
     const result = await transcriber(audio, {
       return_timestamps: true,
@@ -2832,6 +3162,7 @@ async function runAI() {
       language: isEnglishOnly ? undefined : 'en',
     });
     if (S.aiAbort) throw new Error('cancelled');
+
     const chunks = result?.chunks || [];
     if (chunks.length) {
       chunks.forEach(c => {
@@ -2883,6 +3214,11 @@ E.vttBtn.addEventListener('click', () => {
   if (!S.segments.length) return;
   download('captions_' + stamp() + '.vtt', buildVTT(), 'text/vtt');
 });
+
+/* COPY BUTTONS */
+E.copyTextBtn?.addEventListener('click', () => copyToClipboard(buildPlainText(), 'Text'));
+E.copySrtBtn?.addEventListener('click',  () => copyToClipboard(buildSRT(),       'SRT'));
+E.copyVttBtn?.addEventListener('click',  () => copyToClipboard(buildVTT(),       'VTT'));
 
 /* FILE PICKER */
 E.aiFile.addEventListener('change', e => {
@@ -2936,8 +3272,6 @@ E.liveLang.addEventListener('change', () => {
 window.addEventListener('beforeunload', () => {
   S.liveActive = false;
   if (S.liveRec) { try { S.liveRec.abort(); } catch {} }
-  if (S.micStream) { try { S.micStream.getTracks().forEach(t => t.stop()); } catch {} }
-  stopMeter();
 });
 
 /* Keyboard shortcut: Space = start/stop (ignored while modal open) */
@@ -2961,7 +3295,6 @@ function ctrlShiftKey(e, keyCode) {
 }
 
 document.onkeydown = (e) => {
-  // Disable F12, Ctrl + Shift + I, Ctrl + Shift + J, Ctrl + U
   if (
     event.keyCode === 123 ||
     ctrlShiftKey(e, 'I') ||
